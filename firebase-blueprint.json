@@ -1,0 +1,26 @@
+{
+  "entities": {
+    "Lead": {
+      "title": "Lead",
+      "description": "Información de contacto y resultados del diagnóstico de madurez digital.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "description": "Nombre completo del lead" },
+        "email": { "type": "string", "format": "email", "description": "Correo electrónico" },
+        "company": { "type": "string", "description": "Nombre de la empresa" },
+        "size": { "type": "string", "description": "Rango de tamaño de la empresa" },
+        "answers": { "type": "object", "description": "Respuestas al cuestionario (ID: Valor)" },
+        "score": { "type": "number", "description": "Índice de Madurez Digital (0-100)" },
+        "level": { "type": "string", "description": "Nivel de madurez alcanzado" },
+        "timestamp": { "type": "string", "format": "date-time", "description": "Fecha y hora de creación" }
+      },
+      "required": ["name", "email", "company", "size", "score", "level"]
+    }
+  },
+  "firestore": {
+    "leads": {
+      "schema": "Lead",
+      "description": "Colección de leads capturados a través del diagnóstico."
+    }
+  }
+}
