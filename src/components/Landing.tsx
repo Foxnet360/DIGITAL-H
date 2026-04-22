@@ -14,13 +14,13 @@ export default function Landing({ onStart }: LandingProps) {
         animate={{ opacity: 1, y: 0 }}
         className="max-w-4xl w-full space-y-8"
       >
-        <div className="inline-flex items-center px-4 py-2 rounded-full bg-indigo-50 text-indigo-600 font-semibold text-sm mb-4">
+        <div className="inline-flex items-center px-4 py-2 rounded-full bg-primary-50 text-primary-600 font-semibold text-sm mb-4">
           <Rocket className="w-4 h-4 mr-2" />
           Transformación Digital para PYMEs
         </div>
         
         <h1 className="text-5xl md:text-7xl font-bold text-[#1E293B] tracking-tight leading-tight">
-          DIGITAL-<span className="text-indigo-600">H</span>
+          DIGITAL-<span className="text-primary-600">H</span>
         </h1>
         
         <p className="text-xl text-slate-600 max-w-2xl mx-auto leading-relaxed">
@@ -44,7 +44,7 @@ export default function Landing({ onStart }: LandingProps) {
               transition={{ delay: 0.1 * i }}
               className="flex flex-col items-center p-4 bg-white rounded-2xl shadow-sm border border-slate-100"
             >
-              <item.icon className="w-8 h-8 text-indigo-500 mb-2" />
+              <item.icon className="w-8 h-8 text-primary-500 mb-2" />
               <span className="text-sm font-medium text-slate-700">{item.label}</span>
             </motion.div>
           ))}
@@ -54,7 +54,7 @@ export default function Landing({ onStart }: LandingProps) {
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           onClick={onStart}
-          className="px-8 py-4 bg-indigo-600 text-white rounded-2xl font-bold text-lg shadow-lg shadow-indigo-200 flex items-center mx-auto"
+          className="px-8 py-4 bg-primary-600 text-white rounded-2xl font-bold text-lg shadow-lg shadow-primary-200 flex items-center mx-auto"
         >
           Comenzar Diagnóstico
           <ChevronRight className="ml-2 w-5 h-5" />

@@ -23,13 +23,5 @@ export interface Badge {
   condition: string;
 }
 
-export interface Lead {
-  name: string;
-  email: string;
-  company: string;
-  size: string;
-  timestamp: any;
-  answers: Record<string, number>;
-  score: number;
-  level: string;
-}
+// Re-export shared types
+export type { Lead, DiagnosticRequest } from './types/shared';

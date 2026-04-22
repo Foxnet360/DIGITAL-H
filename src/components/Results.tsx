@@ -4,16 +4,17 @@ import { Radar, RadarChart, PolarGrid, PolarAngleAxis, ResponsiveContainer } fro
 import { 
   Download, Share2, Calendar, ChevronRight, Award, TrendingUp, 
   X, CheckCircle2, ExternalLink, BookOpen, Rocket, Cpu, Zap, 
-  BarChart3, Layout, ShieldCheck, Users, Heart, Star, Map
+  BarChart3, Map
 } from 'lucide-react';
 import { DIMENSIONS } from '../constants';
 import { getMaturityLevel } from '../utils';
-import jsPDF from 'jspdf';
-import html2canvas from 'html2canvas';
+import { Lead } from '../types';
+import { USER_LEVELS } from '../levels';
+import { generateReportPDF } from '../generateReportPDF';
 
 interface ResultsProps {
   answers: Record<string, number>;
-  lead: any;
+  lead: Lead;
 }
 
 export default function Results({ answers, lead }: ResultsProps) {
@@ -37,28 +38,19 @@ export default function Results({ answers, lead }: ResultsProps) {
   });
 
   const handleDownloadPDF = async () => {
-    if (!resultsRef.current) return;
     setIsDownloading(true);
-    
     try {
-      const canvas = await html2canvas(resultsRef.current, {
-        scale: 2,
-        useCORS: true,
-        logging: false,
-        backgroundColor: '#fcfcfc',
-        onclone: (doc) => {
-          const elements = doc.querySelectorAll('*');
-          for (let i = 0; i < elements.length; i++) {
-             (elements[i] as HTMLElement).style.boxShadow = 'none';
-          }
-        }
+      await generateReportPDF({
+        answers,
+        lead: {
+          name: lead.name,
+          email: lead.email,
+          company: lead.company,
+          size: lead.size,
+          score: lead.score,
+          level: lead.level,
+        },
       });
-      
-      const imgData = canvas.toDataURL('image/png');
-      const pdf = new jsPDF('p', 'px', [canvas.width, canvas.height]);
-      pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height);
-      
-      pdf.save(`Diagnostico_DigitalH_${lead.name.replace(/\s+/g, '_')}.pdf`);
     } catch (error) {
       console.error('Error generating PDF:', error);
     } finally {
@@ -115,13 +107,17 @@ export default function Results({ answers, lead }: ResultsProps) {
           className="bg-white rounded-[2.5rem] p-8 md:p-12 shadow-xl border border-slate-100 flex flex-col md:flex-row items-center gap-12"
         >
           <div className="flex-1 text-center md:text-left space-y-6">
-            <div className="inline-flex items-center px-4 py-2 rounded-full bg-indigo-50 text-indigo-600 font-bold text-sm">
+            <div className="inline-flex items-center px-4 py-2 rounded-full bg-primary-50 text-primary-600 font-bold text-sm">
               <Award className="w-4 h-4 mr-2" />
               Diagnóstico Completado para {lead.company}
             </div>
             <h1 className="text-4xl md:text-6xl font-black text-slate-800 leading-tight">
               Tu Madurez Digital es <span style={{ color: level.color }}>{level.name}</span>
             </h1>
+            <div className="inline-flex items-center px-4 py-2 rounded-full bg-accent-100 text-primary-700 font-bold text-sm mt-2">
+              <span className="mr-2">{USER_LEVELS[level.name]?.icon || '🎯'}</span>
+              Nivel: {USER_LEVELS[level.name]?.name || level.name}
+            </div>
             <p className="text-xl text-slate-500 leading-relaxed">
               {level.description} Has obtenido un índice de madurez del {imd}%.
             </p>
@@ -129,7 +125,7 @@ export default function Results({ answers, lead }: ResultsProps) {
               <button 
                 onClick={handleDownloadPDF}
                 disabled={isDownloading}
-                className="px-6 py-3 bg-indigo-600 text-white rounded-xl font-bold flex items-center shadow-lg shadow-indigo-100 disabled:opacity-50 transition-all hover:bg-indigo-700"
+                className="px-6 py-3 bg-primary-600 text-white rounded-xl font-bold flex items-center shadow-lg shadow-primary-100 disabled:opacity-50 transition-all hover:bg-primary-700"
               >
                 {isDownloading ? (
                   <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
@@ -173,7 +169,7 @@ export default function Results({ answers, lead }: ResultsProps) {
                 initial={{ strokeDashoffset: 2 * Math.PI * 110 }}
                 animate={{ strokeDashoffset: 2 * Math.PI * 110 * (1 - imd / 100) }}
                 transition={{ duration: 1.5, ease: "easeOut" }}
-                className="text-indigo-600"
+                className="text-primary-600"
                 strokeLinecap="round"
               />
             </svg>
@@ -192,7 +188,7 @@ export default function Results({ answers, lead }: ResultsProps) {
             className="bg-white rounded-[2.5rem] p-8 shadow-xl border border-slate-100"
           >
             <h3 className="text-xl font-bold text-slate-800 mb-8 flex items-center">
-              <TrendingUp className="w-6 h-6 mr-2 text-indigo-500" />
+              <TrendingUp className="w-6 h-6 mr-2 text-primary-500" />
               Análisis por Dimensión
             </h3>
             <div className="h-[400px] w-full">
@@ -219,7 +215,7 @@ export default function Results({ answers, lead }: ResultsProps) {
             className="bg-white rounded-[2.5rem] p-8 shadow-xl border border-slate-100 flex flex-col"
           >
             <h3 className="text-xl font-bold text-slate-800 mb-8 flex items-center">
-              <Calendar className="w-6 h-6 mr-2 text-indigo-500" />
+              <Calendar className="w-6 h-6 mr-2 text-primary-500" />
               Próximos Pasos Sugeridos
             </h3>
             <div className="space-y-4 flex-1">
@@ -227,16 +223,16 @@ export default function Results({ answers, lead }: ResultsProps) {
                 <div 
                   key={i} 
                   onClick={() => setSelectedStep(i)}
-                  className="flex items-start p-4 bg-slate-50 rounded-2xl group hover:bg-indigo-50 transition-all cursor-pointer border border-transparent hover:border-indigo-100"
+                  className="flex items-start p-4 bg-slate-50 rounded-2xl group hover:bg-primary-50 transition-all cursor-pointer border border-transparent hover:border-primary-100"
                 >
-                  <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center text-indigo-600 mr-4 shadow-sm group-hover:bg-indigo-600 group-hover:text-white transition-all">
+                    <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center text-primary-600 mr-4 shadow-sm group-hover:bg-primary-600 group-hover:text-white transition-all">
                     <step.icon className="w-5 h-5" />
                   </div>
                   <div className="flex-1">
                     <p className="text-slate-800 font-bold text-sm mb-1">{step.title}</p>
                     <p className="text-slate-500 text-sm">{step.description}</p>
                   </div>
-                  <ChevronRight className="w-5 h-5 text-slate-300 group-hover:text-indigo-400 group-hover:translate-x-1 transition-all" />
+                  <ChevronRight className="w-5 h-5 text-slate-300 group-hover:text-primary-400 group-hover:translate-x-1 transition-all" />
                 </div>
               ))}
             </div>
@@ -260,7 +256,7 @@ export default function Results({ answers, lead }: ResultsProps) {
           <div className="flex items-center justify-between mb-12">
             <div>
               <h2 className="text-3xl font-bold text-slate-800 flex items-center">
-                <Map className="w-8 h-8 mr-3 text-indigo-600" />
+                <Map className="w-8 h-8 mr-3 text-primary-600" />
                 Hoja de Ruta de Transformación
               </h2>
               <p className="text-slate-500 mt-2">Tu camino personalizado hacia la excelencia digital.</p>
@@ -274,16 +270,16 @@ export default function Results({ answers, lead }: ResultsProps) {
             <div className="space-y-12">
               {roadmap.map((item, i) => (
                 <div key={i} className="relative flex flex-col md:flex-row items-start md:items-center gap-6 md:gap-12">
-                  <div className="hidden md:flex absolute left-8 -translate-x-1/2 w-4 h-4 rounded-full bg-indigo-600 border-4 border-white shadow-sm z-10" />
+                  <div className="hidden md:flex absolute left-8 -translate-x-1/2 w-4 h-4 rounded-full bg-primary-600 border-4 border-white shadow-sm z-10" />
                   
-                  <div className="w-full md:w-32 text-indigo-600 font-bold text-sm uppercase tracking-widest">
+                  <div className="w-full md:w-32 text-primary-600 font-bold text-sm uppercase tracking-widest">
                     {item.time}
                   </div>
                   
-                  <div className="flex-1 bg-slate-50 p-6 rounded-3xl border border-slate-100 hover:border-indigo-100 transition-all">
+                  <div className="flex-1 bg-slate-50 p-6 rounded-3xl border border-slate-100 hover:border-primary-100 transition-all">
                     <div className="flex items-center justify-between mb-2">
                       <h4 className="text-lg font-bold text-slate-800">{item.phase}</h4>
-                      <span className="px-3 py-1 bg-indigo-100 text-indigo-600 text-xs font-bold rounded-full uppercase">
+                      <span className="px-3 py-1 bg-primary-100 text-primary-600 text-xs font-bold rounded-full uppercase">
                         {item.status}
                       </span>
                     </div>
@@ -299,7 +295,7 @@ export default function Results({ answers, lead }: ResultsProps) {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-indigo-600 rounded-[2.5rem] p-8 md:p-12 text-white shadow-2xl shadow-indigo-200"
+          className="bg-primary-600 rounded-[2.5rem] p-8 md:p-12 text-white shadow-2xl shadow-primary-200"
         >
           <div className="flex flex-col md:flex-row items-center justify-between gap-8">
             <div className="space-y-4">
@@ -315,7 +311,7 @@ export default function Results({ answers, lead }: ResultsProps) {
                   href={res.link}
                   className="bg-[rgba(255,255,255,0.1)] backdrop-blur-md p-4 rounded-2xl border border-[rgba(255,255,255,0.2)] hover:bg-[rgba(255,255,255,0.2)] transition-all flex items-center space-x-4 group"
                 >
-                  <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-indigo-600 group-hover:scale-110 transition-transform">
+                  <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-primary-600 group-hover:scale-110 transition-transform">
                     <BookOpen className="w-5 h-5" />
                   </div>
                   <div>
@@ -354,7 +350,7 @@ export default function Results({ answers, lead }: ResultsProps) {
               </button>
               
               <div className="space-y-6">
-                <div className="w-16 h-16 bg-indigo-50 rounded-2xl flex items-center justify-center text-indigo-600">
+                <div className="w-16 h-16 bg-primary-50 rounded-2xl flex items-center justify-center text-primary-600">
                   <CheckCircle2 className="w-8 h-8" />
                 </div>
                 <h3 className="text-3xl font-bold text-slate-800">{nextSteps[selectedStep].title}</h3>
@@ -364,7 +360,7 @@ export default function Results({ answers, lead }: ResultsProps) {
                 <div className="pt-6">
                   <button 
                     onClick={() => setSelectedStep(null)}
-                    className="w-full py-4 bg-indigo-600 text-white rounded-2xl font-bold text-lg shadow-lg shadow-indigo-100 hover:bg-indigo-700 transition-all"
+                    className="w-full py-4 bg-primary-600 text-white rounded-2xl font-bold text-lg shadow-lg shadow-primary-100 hover:bg-primary-700 transition-all"
                   >
                     Entendido
                   </button>

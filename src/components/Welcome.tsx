@@ -18,8 +18,8 @@ export default function Welcome({ onNext }: WelcomeProps) {
         
         <div className="space-y-6 mb-10">
           <div className="flex items-start space-x-4">
-            <div className="p-3 bg-indigo-50 rounded-xl">
-              <Info className="w-6 h-6 text-indigo-600" />
+            <div className="p-3 bg-primary-50 rounded-xl">
+              <Info className="w-6 h-6 text-primary-600" />
             </div>
             <div>
               <h3 className="font-bold text-slate-800">¿Qué obtendrás?</h3>
@@ -54,7 +54,7 @@ export default function Welcome({ onNext }: WelcomeProps) {
 
         <button
           onClick={onNext}
-          className="w-full py-4 bg-indigo-600 text-white rounded-2xl font-bold text-lg shadow-lg shadow-indigo-200 flex items-center justify-center hover:bg-indigo-700 transition-colors"
+          className="w-full py-4 bg-primary-600 text-white rounded-2xl font-bold text-lg shadow-lg shadow-primary-200 flex items-center justify-center hover:bg-primary-700 transition-colors"
         >
           Empezar ahora
           <ChevronRight className="ml-2 w-5 h-5" />

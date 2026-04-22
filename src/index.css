@@ -2,20 +2,44 @@
 @import "tailwindcss";
 
 @theme {
-  /* Override indigo with Acrux Teal (#2e86ab) */
-  --color-indigo-50: #f2f8fa;
-  --color-indigo-100: #e0eff5;
-  --color-indigo-200: #b9dce9;
-  --color-indigo-300: #88c1d8;
-  --color-indigo-400: #519fc3;
-  --color-indigo-500: #3586ab;
-  --color-indigo-600: #2e86ab;
-  --color-indigo-700: #266b8b;
-  --color-indigo-800: #225973;
-  --color-indigo-900: #1d4b62;
-  --color-indigo-950: #113041;
+  /* Acrux Brand Palette */
+  --color-primary-50: #e8eef5;
+  --color-primary-100: #c5d4e6;
+  --color-primary-200: #9eb5d4;
+  --color-primary-300: #7796c2;
+  --color-primary-400: #5a7eb6;
+  --color-primary-500: #3d668a;
+  --color-primary-600: #1e3a5f;
+  --color-primary-700: #1a3252;
+  --color-primary-800: #162a45;
+  --color-primary-900: #122238;
 
-  /* Override slates with HEX to prevent html2canvas OKLCH crash */
+  --color-accent-50: #e6faff;
+  --color-accent-100: #b3f0ff;
+  --color-accent-200: #80e5ff;
+  --color-accent-300: #4ddbff;
+  --color-accent-400: #26d1ff;
+  --color-accent-500: #00c4f5;
+  --color-accent-600: #00d4ff;
+
+  --color-success: #10b981;
+  --color-warning: #f59e0b;
+  --color-error: #ef4444;
+
+  /* Override indigo with Acrux primary for backward compat */
+  --color-indigo-50: #e8eef5;
+  --color-indigo-100: #c5d4e6;
+  --color-indigo-200: #9eb5d4;
+  --color-indigo-300: #7796c2;
+  --color-indigo-400: #5a7eb6;
+  --color-indigo-500: #3d668a;
+  --color-indigo-600: #1e3a5f;
+  --color-indigo-700: #1a3252;
+  --color-indigo-800: #162a45;
+  --color-indigo-900: #122238;
+  --color-indigo-950: #0e1a2b;
+
+  /* Override slates with HEX to prevent OKLCH crash */
   --color-slate-50: #f8fafc;
   --color-slate-100: #f1f5f9;
   --color-slate-200: #e2e8f0;
@@ -24,8 +48,8 @@
   --color-slate-500: #64748b;
   --color-slate-600: #475569;
   --color-slate-700: #334155;
-  --color-slate-800: #252a4a; /* Acrux adapted */
-  --color-slate-900: #1b1f3b; /* Acrux Navy */
+  --color-slate-800: #1f2937;
+  --color-slate-900: #1b1f3b;
 
   /* Override Shadows to avoid OKLCH */
   --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
@@ -37,11 +61,11 @@
   --shadow-inner: inset 0 2px 4px 0 rgba(0, 0, 0, 0.05);
 
   /* Custom semantics */
-  --color-accent: #5fe8ff;
+  --color-accent: #00d4ff;
   --color-background: #fcfcfc;
   --color-surface: #f0f4f8;
 
   /* Fonts */
-  --font-sans: "Inter", sans-serif;
-  --font-display: "Exo 2", sans-serif;
+  --font-sans: "Inter", system-ui, -apple-system, sans-serif;
+  --font-display: "Exo 2", system-ui, -apple-system, sans-serif;
 }

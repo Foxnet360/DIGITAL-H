@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
-import { Mail, User, Building2, Users2, ChevronRight, Lock } from 'lucide-react';
+import { Mail, User, Building2, Users2, ChevronRight, Lock, ShieldCheck } from 'lucide-react';
 
 interface LeadFormProps {
-  onSubmit: (data: { name: string; email: string; company: string; size: string }) => void;
+  onSubmit: (data: { name: string; email: string; company: string; size: string; gdprConsent: boolean; gdprTimestamp: number }) => void;
 }
 
 export default function LeadForm({ onSubmit }: LeadFormProps) {
@@ -11,12 +11,21 @@ export default function LeadForm({ onSubmit }: LeadFormProps) {
     name: '',
     email: '',
     company: '',
-    size: ''
+    size: '',
+    gdprConsent: false
   });
+  const [gdprError, setGdprError] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit(formData);
+    if (!formData.gdprConsent) {
+      setGdprError(true);
+      return;
+    }
+    onSubmit({
+      ...formData,
+      gdprTimestamp: Date.now()
+    });
   };
 
   return (
@@ -27,8 +36,8 @@ export default function LeadForm({ onSubmit }: LeadFormProps) {
         className="max-w-xl w-full bg-white rounded-3xl p-8 md:p-12 shadow-xl border border-slate-100"
       >
         <div className="text-center mb-10">
-          <div className="w-16 h-16 bg-indigo-50 rounded-2xl flex items-center justify-center mx-auto mb-6">
-            <Lock className="w-8 h-8 text-indigo-600" />
+          <div className="w-16 h-16 bg-primary-50 rounded-2xl flex items-center justify-center mx-auto mb-6">
+            <Lock className="w-8 h-8 text-primary-600" />
           </div>
           <h2 className="text-3xl font-bold text-slate-800 mb-2">¡Casi listo!</h2>
           <p className="text-slate-500">
@@ -45,7 +54,7 @@ export default function LeadForm({ onSubmit }: LeadFormProps) {
                 required
                 type="text"
                 placeholder="Ej. Juan Pérez"
-                className="w-full pl-12 pr-4 py-4 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all"
+                className="w-full pl-12 pr-4 py-4 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all"
                 value={formData.name}
                 onChange={e => setFormData({ ...formData, name: e.target.value })}
               />
@@ -60,7 +69,7 @@ export default function LeadForm({ onSubmit }: LeadFormProps) {
                 required
                 type="email"
                 placeholder="juan@empresa.com"
-                className="w-full pl-12 pr-4 py-4 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all"
+                className="w-full pl-12 pr-4 py-4 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all"
                 value={formData.email}
                 onChange={e => setFormData({ ...formData, email: e.target.value })}
               />
@@ -75,7 +84,7 @@ export default function LeadForm({ onSubmit }: LeadFormProps) {
                 required
                 type="text"
                 placeholder="Nombre de tu organización"
-                className="w-full pl-12 pr-4 py-4 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all"
+                className="w-full pl-12 pr-4 py-4 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all"
                 value={formData.company}
                 onChange={e => setFormData({ ...formData, company: e.target.value })}
               />
@@ -88,7 +97,7 @@ export default function LeadForm({ onSubmit }: LeadFormProps) {
               <Users2 className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
               <select
                 required
-                className="w-full pl-12 pr-4 py-4 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all appearance-none"
+                className="w-full pl-12 pr-4 py-4 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all appearance-none"
                 value={formData.size}
                 onChange={e => setFormData({ ...formData, size: e.target.value })}
               >
@@ -101,17 +110,42 @@ export default function LeadForm({ onSubmit }: LeadFormProps) {
             </div>
           </div>
 
+          <div className="space-y-2">
+            <div className="flex items-start space-x-3">
+              <input
+                id="gdpr"
+                type="checkbox"
+                checked={formData.gdprConsent}
+                onChange={e => {
+                  setFormData({ ...formData, gdprConsent: e.target.checked });
+                  setGdprError(false);
+                }}
+                className={`mt-1 w-5 h-5 rounded border-2 cursor-pointer transition-colors ${
+                  gdprError ? 'border-error' : 'border-slate-300'
+                }`}
+              />
+              <label htmlFor="gdpr" className="text-sm text-slate-600 cursor-pointer leading-relaxed">
+                Acepto el tratamiento de mis datos personales para recibir el diagnóstico y comunicaciones relacionadas. 
+                He leído y acepto la <a href="#" className="text-primary-600 underline">política de privacidad</a>.
+              </label>
+            </div>
+            {gdprError && (
+              <p className="text-error text-sm ml-8">Debes aceptar la política de privacidad para continuar.</p>
+            )}
+          </div>
+
           <button
             type="submit"
-            className="w-full py-4 bg-indigo-600 text-white rounded-2xl font-bold text-lg shadow-lg shadow-indigo-200 flex items-center justify-center hover:bg-indigo-700 transition-colors mt-8"
+            className="w-full py-4 bg-primary-600 text-white rounded-2xl font-bold text-lg shadow-lg shadow-primary-200 flex items-center justify-center hover:bg-primary-700 transition-colors mt-8"
           >
             Continuar al Diagnóstico
             <ChevronRight className="ml-2 w-5 h-5" />
           </button>
           
-          <p className="text-xs text-center text-slate-400 mt-4">
-            Al continuar, aceptas nuestra política de privacidad y el tratamiento de tus datos para el diagnóstico.
-          </p>
+          <div className="flex items-center justify-center space-x-2 text-xs text-slate-400 mt-4">
+            <ShieldCheck className="w-4 h-4 text-success" />
+            <span>Tus datos están protegidos y nunca serán compartidos con terceros.</span>
+          </div>
         </form>
       </motion.div>
     </div>
