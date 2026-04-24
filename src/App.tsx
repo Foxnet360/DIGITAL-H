@@ -134,7 +134,7 @@ export default function App() {
     };
 
     try {
-      const response = await fetch('/digital-h/api/diagnostic.php', {
+      const response = await fetch('./api/diagnostic.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(diagnosticData),
@@ -168,7 +168,7 @@ export default function App() {
     }
   };
 
-  const handleLeadSubmit = (data: any) => {
+  const handleLeadSubmit = (data: { name: string; email: string; phone: string; company: string; size: string; role: string; industry: string; gdprConsent: boolean; gdprTimestamp: number }) => {
     setLead(data);
     setScreen('questionnaire');
     setCurrentIdx(32);
@@ -214,7 +214,7 @@ export default function App() {
           <div className="flex justify-between items-center h-16">
             <div className="flex-shrink-0 flex items-center">
               <a className="flex items-center gap-2 md:gap-3" href="https://acrux.life" onClick={handleVolverClick}>
-                <img src="/acrux_logo.svg" alt="ACRUX" className="h-8 md:h-10 w-auto" />
+                <img src="./acrux_logo.svg" alt="ACRUX" className="h-8 md:h-10 w-auto" />
                 <span className="block font-display font-bold tracking-tight text-slate-900 text-xl leading-7">
                   Acrux Consultores
                 </span>

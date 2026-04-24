@@ -4,7 +4,7 @@ import { Radar, RadarChart, PolarGrid, PolarAngleAxis, ResponsiveContainer } fro
 import { 
   Download, Share2, Calendar, ChevronRight, Award, TrendingUp, 
   X, CheckCircle2, ExternalLink, BookOpen, Rocket, Cpu, Zap, 
-  BarChart3, Map
+  BarChart3, Map, Linkedin, Phone
 } from 'lucide-react';
 import { DIMENSIONS } from '../constants';
 import { getMaturityLevel } from '../utils';
@@ -91,11 +91,33 @@ export default function Results({ answers, lead }: ResultsProps) {
     { phase: "Fase 3: Escalamiento", time: "Mes 6+", task: "Analítica avanzada y optimización continua basada en datos.", status: "Visión" }
   ];
 
-  const resources = [
-    { title: "Guía: 10 Pasos para Iniciar tu Transformación", type: "PDF", link: "#" },
-    { title: "Ebook: La PYME Digital del Siglo XXI", type: "Ebook", link: "#" },
-    { title: "Webinar: Interpretando Resultados DIGITAL-H", type: "Video", link: "#" }
-  ];
+  // Resources based on maturity level
+  const getResources = () => {
+    const baseResources = [
+      { 
+        title: "Guía: 10 Pasos para Iniciar tu Transformación", 
+        type: "PDF", 
+        link: "https://acrux.life/docs/10-Pasos-Para-la-Transformacion.pdf",
+        description: "22 páginas de acciones prácticas"
+      }
+    ];
+    
+    if (['Inicial', 'Emergente', 'Desarrollo'].includes(level.name)) {
+      return baseResources;
+    }
+    
+    return [
+      ...baseResources,
+      { 
+        title: "Ebook: La PYME Digital del Siglo XXI", 
+        type: "Ebook", 
+        link: "https://acrux.life/docs/eBook-La-PYME-Digital-del-Siglo-XXI.pdf",
+        description: "29 páginas de estrategias digitales"
+      }
+    ];
+  };
+  
+  const resources = getResources();
 
   return (
     <div className="min-h-screen bg-background p-6 pb-24" ref={resultsRef}>
@@ -125,7 +147,7 @@ export default function Results({ answers, lead }: ResultsProps) {
               <button 
                 onClick={handleDownloadPDF}
                 disabled={isDownloading}
-                className="px-6 py-3 bg-primary-600 text-white rounded-xl font-bold flex items-center shadow-lg shadow-primary-100 disabled:opacity-50 transition-all hover:bg-primary-700"
+                className="px-6 py-3 bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-xl font-bold flex items-center shadow-lg shadow-primary-100 disabled:opacity-50 transition-all hover:shadow-xl"
               >
                 {isDownloading ? (
                   <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
@@ -134,16 +156,39 @@ export default function Results({ answers, lead }: ResultsProps) {
                 )}
                 Descargar Reporte PDF
               </button>
+              
               <button 
                 onClick={() => {
-                  const text = `¡He completado mi diagnóstico de madurez digital con DIGITAL-H! Mi nivel es ${level.name} (${imd}%).`;
-                  window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`, '_blank');
+                  const text = `¡He completado mi diagnóstico de madurez digital con DIGITAL-H! Mi nivel es ${level.name} (${imd}%). Descubre el tuyo en https://acrux.life/digital-h/`;
+                  window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent('https://acrux.life/digital-h/')}`, '_blank');
                 }}
-                className="px-6 py-3 bg-white text-slate-600 border border-slate-200 rounded-xl font-bold flex items-center hover:bg-slate-50 transition-all"
+                className="px-6 py-3 bg-[#0077b5] text-white rounded-xl font-bold flex items-center hover:bg-[#006396] transition-all"
               >
-                <Share2 className="w-5 h-5 mr-2" />
-                Compartir Resultados
+                <Linkedin className="w-5 h-5 mr-2" />
+                Compartir en LinkedIn
               </button>
+            </div>
+            
+            {/* Calendly CTA */}
+            <div className="mt-6 p-4 bg-gradient-to-r from-accent-50 to-primary-50 rounded-2xl border border-primary-100">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 bg-primary-600 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <Phone className="w-6 h-6 text-white" />
+                </div>
+                <div className="flex-1">
+                  <h4 className="font-bold text-slate-800">¿Quieres profundizar en tus resultados?</h4>
+                  <p className="text-sm text-slate-600 mt-1">Agenda una consultoría gratuita de 30 minutos con nuestros expertos.</p>
+                </div>
+                <a
+                  href="https://calendly.com/acrux-life/30min"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-6 py-3 bg-primary-600 text-white rounded-xl font-bold hover:bg-primary-700 transition-colors flex items-center gap-2 flex-shrink-0"
+                >
+                  Agendar
+                  <ExternalLink className="w-4 h-4" />
+                </a>
+              </div>
             </div>
           </div>
 
@@ -295,7 +340,7 @@ export default function Results({ answers, lead }: ResultsProps) {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-primary-600 rounded-[2.5rem] p-8 md:p-12 text-white shadow-2xl shadow-primary-200"
+          className="bg-gradient-to-br from-primary-600 to-primary-800 rounded-[2.5rem] p-8 md:p-12 text-white shadow-2xl shadow-primary-200"
         >
           <div className="flex flex-col md:flex-row items-center justify-between gap-8">
             <div className="space-y-4">
@@ -304,20 +349,24 @@ export default function Results({ answers, lead }: ResultsProps) {
                 Basado en tu nivel de madurez <span className="font-bold underline">{level.name}</span>, hemos seleccionado estos recursos para acelerar tu crecimiento.
               </p>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full md:w-auto">
+            <div className="grid grid-cols-1 gap-4 w-full md:w-auto">
               {resources.map((res, i) => (
                 <a 
                   key={i}
                   href={res.link}
-                  className="bg-[rgba(255,255,255,0.1)] backdrop-blur-md p-4 rounded-2xl border border-[rgba(255,255,255,0.2)] hover:bg-[rgba(255,255,255,0.2)] transition-all flex items-center space-x-4 group"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bg-white/10 backdrop-blur-md p-5 rounded-2xl border border-white/20 hover:bg-white/20 transition-all flex items-center space-x-4 group"
                 >
-                  <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-primary-600 group-hover:scale-110 transition-transform">
-                    <BookOpen className="w-5 h-5" />
+                  <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center text-primary-600 group-hover:scale-110 transition-transform">
+                    <BookOpen className="w-6 h-6" />
                   </div>
-                  <div>
+                  <div className="flex-1">
                     <p className="text-xs font-bold text-indigo-200 uppercase tracking-widest">{res.type}</p>
                     <p className="text-sm font-bold">{res.title}</p>
+                    <p className="text-xs text-indigo-200 mt-1">{res.description}</p>
                   </div>
+                  <Download className="w-5 h-5 text-white/60 group-hover:text-white transition-colors" />
                 </a>
               ))}
             </div>

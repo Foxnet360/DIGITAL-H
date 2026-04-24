@@ -17,7 +17,7 @@ interface PDFData {
 
 async function loadLogoAsDataUrl(): Promise<string | null> {
   try {
-    const response = await fetch('/logo.png');
+    const response = await fetch('./logo.png');
     const blob = await response.blob();
     return new Promise((resolve) => {
       const reader = new FileReader();

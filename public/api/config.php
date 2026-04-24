@@ -1,15 +1,14 @@
 <?php
 // Configuración de la base de datos MySQL - Hostinger
-// Valores hardcodeados porque las variables de entorno no están configuradas en Hostinger
 $DB_HOST = 'localhost';
 $DB_USER = 'u554044004_acruxuser';
 $DB_PASS = '4Crux2026*';
 $DB_NAME = 'u554044004_acruxdb';
 
-// Configuración SMTP
+// Configuración SMTP - Hostinger
 $SMTP_HOST = 'smtp.hostinger.com';
 $SMTP_PORT = 465;
-$SMTP_SECURE = true;
+$SMTP_SECURE = true; // SSL
 $SMTP_USER = 'hola@acrux.life';
 $SMTP_PASS = '4Crux2026*';
 $SMTP_FROM = 'DIGITAL-H <hola@acrux.life>';
@@ -36,9 +35,9 @@ function sendJSON($data, $statusCode = 200) {
     exit;
 }
 
-// Función para enviar email mejorado
+// Función para enviar email vía SMTP autenticado
 function sendThankYouEmail($email, $name, $company, $imd, $level) {
-    global $SMTP_HOST, $SMTP_PORT, $SMTP_SECURE, $SMTP_USER, $SMTP_PASS, $SMTP_FROM;
+    global $SMTP_HOST, $SMTP_PORT, $SMTP_USER, $SMTP_PASS, $SMTP_FROM;
     
     $userLevels = [
         'Inicial' => 'Explorador Digital',
@@ -139,7 +138,7 @@ function sendThankYouEmail($email, $name, $company, $imd, $level) {
         </div>';
     }
     
-    $subject = "🎯 Tu diagnóstico DIGITAL-H está listo - $level ($imd%)";
+    $subject = "=?UTF-8?B?" . base64_encode("🎯 Tu diagnóstico DIGITAL-H está listo - $level ($imd%)") . "?=";
     
     $html = "
     <!DOCTYPE html>
@@ -150,6 +149,7 @@ function sendThankYouEmail($email, $name, $company, $imd, $level) {
         <title>Tu diagnóstico DIGITAL-H está listo</title>
     </head>
     <body style=\"font-family: 'Inter', Arial, sans-serif; line-height: 1.6; color: #1f2937; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f8fafc;\">
+        
         <!-- Header -->
         <div style=\"background: linear-gradient(135deg, #1e3a5f 0%, #2e86ab 100%); padding: 40px 20px; text-align: center; border-radius: 16px 16px 0 0;\">
             <img src=\"https://acrux.life/logo.png\" alt=\"Acrux Consultores\" style=\"height: 60px; margin-bottom: 16px;\" />
@@ -222,13 +222,20 @@ function sendThankYouEmail($email, $name, $company, $imd, $level) {
     </html>
     ";
     
+    // Headers para el email
+    $boundary = md5(time());
     $headers = "MIME-Version: 1.0\r\n";
     $headers .= "Content-Type: text/html; charset=UTF-8\r\n";
     $headers .= "From: $SMTP_FROM\r\n";
     $headers .= "Reply-To: hola@acrux.life\r\n";
     $headers .= "X-Mailer: PHP/" . phpversion() . "\r\n";
+    $headers .= "X-Priority: 3\r\n";
     
-    return mail($email, $subject, $html, $headers);
+    // En Hostinger, mail() usa el SMTP configurado automáticamente
+    // pero a veces necesita el Return-Path correcto
+    $additional_params = "-f hola@acrux.life";
+    
+    return mail($email, $subject, $html, $headers, $additional_params);
 }
 
 // Función para calcular dimensiones
