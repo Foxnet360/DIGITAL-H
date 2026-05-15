@@ -2,15 +2,18 @@ import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Radar, RadarChart, PolarGrid, PolarAngleAxis, ResponsiveContainer } from 'recharts';
 import { 
-  Download, Share2, Calendar, ChevronRight, Award, TrendingUp, 
-  X, CheckCircle2, ExternalLink, BookOpen, Rocket, Cpu, Zap, 
-  BarChart3, Map, Linkedin, Phone
+  Download, Calendar, ChevronRight, Award, TrendingUp, 
+  X, CheckCircle2, ExternalLink, BookOpen, 
+  Map, Linkedin, Phone
 } from 'lucide-react';
 import { DIMENSIONS } from '../constants';
-import { getMaturityLevel } from '../utils';
+import { getMaturityLevel, getWeakDimensions, getRecommendations, getTestimonials } from '../utils';
 import { Lead } from '../types';
 import { USER_LEVELS } from '../levels';
 import { generateReportPDF } from '../generateReportPDF';
+import { Recommendation } from '../recommendations';
+import BookingCalendar from './BookingCalendar';
+import * as Icons from 'lucide-react';
 
 interface ResultsProps {
   answers: Record<string, number>;
@@ -37,6 +40,11 @@ export default function Results({ answers, lead }: ResultsProps) {
     };
   });
 
+  // Get dynamic recommendations based on user's weak dimensions
+  const weakDimensions = getWeakDimensions(answers);
+  const nextSteps = getRecommendations(weakDimensions);
+  const testimonials = getTestimonials(level.name);
+
   const handleDownloadPDF = async () => {
     setIsDownloading(true);
     try {
@@ -58,32 +66,11 @@ export default function Results({ answers, lead }: ResultsProps) {
     }
   };
 
-  const nextSteps = [
-    {
-      title: "Hoja de Ruta Estratégica",
-      description: "Digitalizar el roadmap estratégico con horizontes de 6-12 meses.",
-      detail: "Define objetivos claros por trimestre, asigna responsables y presupuestos específicos para cada iniciativa digital identificada en este diagnóstico.",
-      icon: Rocket
-    },
-    {
-      title: "Capacitación en IA",
-      description: "Implementar un programa de formación continua en habilidades IA.",
-      detail: "Capacita a tu equipo en el uso de herramientas generativas para aumentar la productividad en un 40% según benchmarks del sector.",
-      icon: Cpu
-    },
-    {
-      title: "Automatización Operativa",
-      description: "Automatizar los 3 procesos más repetitivos del área operativa.",
-      detail: "Identifica cuellos de botella en la cadena de valor y aplica RPA o integraciones simples para liberar tiempo de talento estratégico.",
-      icon: Zap
-    },
-    {
-      title: "Gobernanza de Datos",
-      description: "Establecer un dashboard de KPIs en tiempo real para la dirección.",
-      detail: "Conecta tus fuentes de datos (CRM, ERP, Google Analytics) en un solo tablero visual para tomar decisiones basadas en evidencia.",
-      icon: BarChart3
-    }
-  ];
+  // Helper to get icon component from string name
+  const getIconComponent = (iconName: string) => {
+    const IconComponent = (Icons as any)[iconName];
+    return IconComponent || Icons.Rocket;
+  };
 
   const roadmap = [
     { phase: "Fase 1: Cimientos", time: "Mes 1-2", task: "Alineación estratégica y setup de infraestructura básica.", status: "Prioritario" },
@@ -119,6 +106,57 @@ export default function Results({ answers, lead }: ResultsProps) {
   
   const resources = getResources();
 
+  // Urgency messages by maturity level
+  const getUrgencyMessage = (levelName: string): { text: string; color: string; bgColor: string } => {
+    switch (levelName) {
+      case 'Inicial':
+      case 'Emergente':
+        return {
+          text: "Tu empresa podría estar perdiendo hasta 30% de productividad semanal en procesos manuales y retrabajo. Cada mes de delay representa horas que no recuperarás.",
+          color: 'text-orange-700',
+          bgColor: 'bg-orange-50'
+        };
+      case 'Desarrollo':
+      case 'Avanzado':
+        return {
+          text: "Estás a solo 2-3 acciones estratégicas de pasar al siguiente nivel. El 68% de empresas en tu etapa retroceden por falta de acompañamiento especializado.",
+          color: 'text-blue-700',
+          bgColor: 'bg-blue-50'
+        };
+      case 'Excelente':
+      case 'Referente':
+        return {
+          text: "Mantener tu ventaja competitiva requiere revisión continua. Las empresas líderes reevalúan su madurez digital cada 6 meses.",
+          color: 'text-emerald-700',
+          bgColor: 'bg-emerald-50'
+        };
+      default:
+        return {
+          text: "Este análisis tiene vigencia de 30 días. Las condiciones de mercado cambian rápidamente.",
+          color: 'text-slate-700',
+          bgColor: 'bg-slate-50'
+        };
+    }
+  };
+
+  // Simulated sector percentile based on maturity level
+  const getSectorPercentile = (levelName: string): number => {
+    const percentiles: Record<string, number> = {
+      'Inicial': 15,
+      'Emergente': 35,
+      'Desarrollo': 55,
+      'Avanzado': 75,
+      'Excelente': 90,
+      'Referente': 98
+    };
+    return percentiles[levelName] || 50;
+  };
+
+  const urgency = getUrgencyMessage(level.name);
+  const sectorPercentile = getSectorPercentile(level.name);
+  const expirationDate = new Date();
+  expirationDate.setDate(expirationDate.getDate() + 30);
+
   return (
     <div className="min-h-screen bg-background p-6 pb-24" ref={resultsRef}>
       <div className="max-w-6xl mx-auto space-y-8">
@@ -143,51 +181,111 @@ export default function Results({ answers, lead }: ResultsProps) {
             <p className="text-xl text-slate-500 leading-relaxed">
               {level.description} Has obtenido un índice de madurez del {imd}%.
             </p>
-            <div className="flex flex-wrap gap-4 pt-4">
-              <button 
-                onClick={handleDownloadPDF}
-                disabled={isDownloading}
-                className="px-6 py-3 bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-xl font-bold flex items-center shadow-lg shadow-primary-100 disabled:opacity-50 transition-all hover:shadow-xl"
-              >
-                {isDownloading ? (
-                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
-                ) : (
-                  <Download className="w-5 h-5 mr-2" />
-                )}
-                Descargar Reporte PDF
-              </button>
-              
-              <button 
-                onClick={() => {
-                  const text = `¡He completado mi diagnóstico de madurez digital con DIGITAL-H! Mi nivel es ${level.name} (${imd}%). Descubre el tuyo en https://acrux.life/digital-h/`;
-                  window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent('https://acrux.life/digital-h/')}`, '_blank');
-                }}
-                className="px-6 py-3 bg-[#0077b5] text-white rounded-xl font-bold flex items-center hover:bg-[#006396] transition-all"
-              >
-                <Linkedin className="w-5 h-5 mr-2" />
-                Compartir en LinkedIn
-              </button>
+
+            {/* Urgency Banner */}
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+              className={`${urgency.bgColor} border-l-4 border-current rounded-r-xl p-4 ${urgency.color}`}
+            >
+              <p className="font-semibold text-sm leading-relaxed">
+                {urgency.text}
+              </p>
+            </motion.div>
+
+            {/* Validity Countdown */}
+            <div className="flex items-center justify-between text-sm text-slate-500 bg-slate-50 rounded-xl px-4 py-3">
+              <span className="flex items-center gap-2">
+                <Calendar className="w-4 h-4" />
+                Vigencia del análisis: hasta {expirationDate.toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' })}
+              </span>
+              <span className="text-xs font-medium bg-slate-200 rounded-full px-3 py-1">
+                30 días
+              </span>
             </div>
-            
-            {/* Calendly CTA */}
-            <div className="mt-6 p-4 bg-gradient-to-r from-accent-50 to-primary-50 rounded-2xl border border-primary-100">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-primary-600 rounded-xl flex items-center justify-center flex-shrink-0">
-                  <Phone className="w-6 h-6 text-white" />
-                </div>
-                <div className="flex-1">
-                  <h4 className="font-bold text-slate-800">¿Quieres profundizar en tus resultados?</h4>
-                  <p className="text-sm text-slate-600 mt-1">Agenda una consultoría gratuita de 30 minutos con nuestros expertos.</p>
-                </div>
-                <a
-                  href="https://calendly.com/acrux-life/30min"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="px-6 py-3 bg-primary-600 text-white rounded-xl font-bold hover:bg-primary-700 transition-colors flex items-center gap-2 flex-shrink-0"
+
+            {/* Sector Comparison */}
+            <div className="bg-gradient-to-r from-primary-50 to-accent-50 rounded-xl p-4 border border-primary-100">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm font-semibold text-primary-700">Posición vs empresas de tu tamaño</span>
+                <span className="text-lg font-black text-primary-600">Percentil {sectorPercentile}</span>
+              </div>
+              <div className="w-full bg-white rounded-full h-3">
+                <motion.div
+                  className="h-full bg-gradient-to-r from-primary-500 to-accent-400 rounded-full"
+                  initial={{ width: 0 }}
+                  animate={{ width: `${sectorPercentile}%` }}
+                  transition={{ duration: 1, delay: 0.5 }}
+                />
+              </div>
+              <p className="text-xs text-slate-500 mt-2">
+                El {100 - sectorPercentile}% de empresas similares están en nivel {level.name} o superior
+              </p>
+            </div>
+
+            <div className="space-y-4 pt-4">
+              {/* CTA Primario: Agendar consultoría */}
+              <a
+                href="https://calendly.com/acrux-life/30min"
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => {
+                  if (window.gtag) {
+                    window.gtag('event', 'digital_h_cta_click', {
+                      cta_type: 'schedule_consultation',
+                      cta_location: 'results_hero',
+                      flow_version: 'v2_q48_capture'
+                    });
+                  }
+                }}
+                className="w-full md:w-auto px-8 py-4 bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-2xl font-bold text-lg flex items-center justify-center shadow-xl shadow-primary-200 hover:shadow-2xl hover:scale-105 transition-all duration-300"
+              >
+                <Phone className="w-6 h-6 mr-3" />
+                Reservar mi sesión de 30 min con Psicólogo Organizacional
+              </a>
+              
+              <div className="flex flex-wrap gap-3 justify-center md:justify-start">
+                {/* CTA Secundario: Descargar PDF */}
+                <button 
+                  onClick={() => {
+                    if (window.gtag) {
+                      window.gtag('event', 'digital_h_cta_click', {
+                        cta_type: 'download_pdf',
+                        cta_location: 'results_hero',
+                        flow_version: 'v2_q48_capture'
+                      });
+                    }
+                    handleDownloadPDF();
+                  }}
+                  disabled={isDownloading}
+                  className="px-6 py-3 bg-white border-2 border-primary-200 text-primary-700 rounded-xl font-bold flex items-center hover:bg-primary-50 transition-all disabled:opacity-50"
                 >
-                  Agendar
-                  <ExternalLink className="w-4 h-4" />
-                </a>
+                  {isDownloading ? (
+                    <div className="w-5 h-5 border-2 border-primary-600 border-t-transparent rounded-full animate-spin mr-2" />
+                  ) : (
+                    <Download className="w-5 h-5 mr-2" />
+                  )}
+                  Descargar Reporte PDF
+                </button>
+                
+                {/* CTA Terciario: Compartir */}
+                <button 
+                  onClick={() => {
+                    if (window.gtag) {
+                      window.gtag('event', 'digital_h_cta_click', {
+                        cta_type: 'share_linkedin',
+                        cta_location: 'results_hero',
+                        flow_version: 'v2_q48_capture'
+                      });
+                    }
+                    window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent('https://acrux.life/digital-h/')}`, '_blank');
+                  }}
+                  className="px-4 py-3 text-slate-500 hover:text-[#0077b5] rounded-xl font-semibold text-sm flex items-center hover:bg-slate-50 transition-all"
+                >
+                  <Linkedin className="w-4 h-4 mr-2" />
+                  Compartir
+                </button>
               </div>
             </div>
           </div>
@@ -253,6 +351,114 @@ export default function Results({ answers, lead }: ResultsProps) {
             </div>
           </motion.div>
 
+        {/* Testimonials Section */}
+        {testimonials.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-white rounded-[2.5rem] p-8 md:p-12 shadow-xl border border-slate-100"
+          >
+            <h3 className="text-2xl font-bold text-slate-800 mb-8 text-center">
+              Empresas que ya transformaron su negocio
+            </h3>
+            <div className="grid md:grid-cols-2 gap-6">
+              {testimonials.map((testimonial, i) => (
+                <motion.div
+                  key={testimonial.id}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.1 }}
+                  className="bg-slate-50 rounded-2xl p-6 border border-slate-100"
+                >
+                  <div className="flex items-start gap-4 mb-4">
+                    <div className="w-12 h-12 bg-primary-100 rounded-full flex items-center justify-center flex-shrink-0">
+                      <span className="text-primary-700 font-bold text-lg">
+                        {testimonial.author.charAt(0)}
+                      </span>
+                    </div>
+                    <div>
+                      <p className="font-bold text-slate-800">{testimonial.author}</p>
+                      <p className="text-sm text-slate-500">{testimonial.role}</p>
+                      <p className="text-sm text-slate-400">{testimonial.company}</p>
+                    </div>
+                  </div>
+                  <p className="text-slate-600 italic mb-4">"{testimonial.quote}"</p>
+                  <div className="flex items-center gap-2 text-emerald-600 font-semibold text-sm">
+                    <TrendingUp className="w-4 h-4" />
+                    {testimonial.metric}
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
+        )}
+
+        {/* Persuasive Scheduling Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-gradient-to-br from-primary-600 to-primary-800 rounded-[2.5rem] p-8 md:p-12 text-white shadow-2xl shadow-primary-200"
+        >
+          <div className="flex flex-col md:flex-row items-center gap-8">
+            <div className="flex-1 space-y-4">
+              <div className="inline-flex items-center px-4 py-2 rounded-full bg-white/20 backdrop-blur-sm text-sm font-bold">
+                <Calendar className="w-4 h-4 mr-2" />
+                Consultoría gratuita disponible
+              </div>
+              <h2 className="text-3xl font-bold">¿Quieres profundizar en tus resultados?</h2>
+              <p className="text-indigo-100 text-lg">
+                Agenda una consultoría gratuita de 30 minutos con nuestros expertos en transformación digital.
+              </p>
+              <ul className="space-y-2">
+                <li className="flex items-center gap-3">
+                  <CheckCircle2 className="w-5 h-5 text-accent-400 flex-shrink-0" />
+                  <span>Análisis personalizado de tus resultados</span>
+                </li>
+                <li className="flex items-center gap-3">
+                  <CheckCircle2 className="w-5 h-5 text-accent-400 flex-shrink-0" />
+                  <span>Hoja de ruta priorizada para tu empresa</span>
+                </li>
+                <li className="flex items-center gap-3">
+                  <CheckCircle2 className="w-5 h-5 text-accent-400 flex-shrink-0" />
+                  <span>Sin compromiso ni costo</span>
+                </li>
+              </ul>
+            </div>
+            <a
+              href="https://calendly.com/acrux-life/30min"
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => {
+                if (window.gtag) {
+                  window.gtag('event', 'digital_h_cta_click', {
+                    cta_type: 'schedule_consultation',
+                    cta_location: 'results_persuasive_section',
+                    flow_version: 'v2_q48_capture'
+                  });
+                }
+              }}
+              className="px-10 py-5 bg-white text-primary-700 rounded-2xl font-bold text-lg flex items-center gap-3 hover:scale-105 hover:shadow-xl transition-all duration-300 shadow-lg"
+            >
+              <Phone className="w-6 h-6" />
+              Agendar mi consultoría
+              <ExternalLink className="w-5 h-5" />
+            </a>
+          </div>
+        </motion.div>
+
+        {/* Custom Booking Calendar */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="max-w-2xl mx-auto"
+        >
+          <BookingCalendar
+            leadEmail={lead.email}
+            leadName={lead.name}
+            company={lead.company || 'No especificado'}
+          />
+        </motion.div>
+
           {/* Recommendations & Next Steps */}
           <motion.div
             initial={{ opacity: 0, x: 20 }}
@@ -264,22 +470,25 @@ export default function Results({ answers, lead }: ResultsProps) {
               Próximos Pasos Sugeridos
             </h3>
             <div className="space-y-4 flex-1">
-              {nextSteps.map((step, i) => (
-                <div 
-                  key={i} 
-                  onClick={() => setSelectedStep(i)}
-                  className="flex items-start p-4 bg-slate-50 rounded-2xl group hover:bg-primary-50 transition-all cursor-pointer border border-transparent hover:border-primary-100"
-                >
-                    <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center text-primary-600 mr-4 shadow-sm group-hover:bg-primary-600 group-hover:text-white transition-all">
-                    <step.icon className="w-5 h-5" />
+              {nextSteps.map((step, i) => {
+                const IconComponent = getIconComponent(step.icon);
+                return (
+                  <div 
+                    key={step.id} 
+                    onClick={() => setSelectedStep(i)}
+                    className="flex items-start p-4 bg-slate-50 rounded-2xl group hover:bg-primary-50 transition-all cursor-pointer border border-transparent hover:border-primary-100"
+                  >
+                      <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center text-primary-600 mr-4 shadow-sm group-hover:bg-primary-600 group-hover:text-white transition-all">
+                      <IconComponent className="w-5 h-5" />
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-slate-800 font-bold text-sm mb-1">{step.title}</p>
+                      <p className="text-slate-500 text-sm">{step.description}</p>
+                    </div>
+                    <ChevronRight className="w-5 h-5 text-slate-300 group-hover:text-primary-400 group-hover:translate-x-1 transition-all" />
                   </div>
-                  <div className="flex-1">
-                    <p className="text-slate-800 font-bold text-sm mb-1">{step.title}</p>
-                    <p className="text-slate-500 text-sm">{step.description}</p>
-                  </div>
-                  <ChevronRight className="w-5 h-5 text-slate-300 group-hover:text-primary-400 group-hover:translate-x-1 transition-all" />
-                </div>
-              ))}
+                );
+              })}
             </div>
             
             <button 

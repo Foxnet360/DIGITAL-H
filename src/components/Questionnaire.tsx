@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { ChevronLeft, ChevronRight, Rocket, Heart, Users, Cpu, BarChart3, Star } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Rocket, Heart, Users, Cpu, BarChart3, Star, Save, Clock } from 'lucide-react';
 import { Question, Dimension } from '../types';
 import { DIMENSIONS } from '../constants';
 
@@ -11,11 +11,25 @@ interface QuestionnaireProps {
   onAnswer: (questionId: string, value: number) => void;
   onNext: () => void;
   onPrev: () => void;
+  onSaveSession?: () => void;
   points: number;
+  startTime?: number;
 }
 
 const ICONS: Record<string, any> = {
   Rocket, Heart, Users, Cpu, BarChart3, Star
+};
+
+// Motivational messages based on progress milestones
+const getMotivationalMessage = (currentIdx: number, total: number): string => {
+  const progress = currentIdx / total;
+  if (progress === 0) return "¡Comencemos! Estás a punto de descubrir el nivel de madurez digital de tu empresa.";
+  if (progress < 0.17) return "¡Excelente inicio! Cada respuesta construye tu mapa de madurez digital.";
+  if (progress < 0.33) return "¡Vas muy bien! Ya completaste la primera dimensión. Sigue así.";
+  if (progress < 0.50) return "¡Mitad del camino! Tu análisis está tomando forma.";
+  if (progress < 0.67) return "¡Impresionante! Ya dominaste la mayoría de las dimensiones.";
+  if (progress < 0.83) return "¡Casi listo! Solo faltan unas pocas preguntas para tu reporte completo.";
+  return "¡Última dimensión! Tu reporte personalizado está a punto de generarse.";
 };
 
 export default function Questionnaire({
@@ -25,12 +39,33 @@ export default function Questionnaire({
   onAnswer,
   onNext,
   onPrev,
-  points
+  onSaveSession,
+  points,
+  startTime
 }: QuestionnaireProps) {
   const question = questions[currentIdx];
   const dimension = DIMENSIONS.find(d => d.id === question.dimension)!;
   const Icon = ICONS[dimension.icon];
   const progress = ((currentIdx + 1) / questions.length) * 100;
+  const [elapsedTime, setElapsedTime] = useState(0);
+
+  // Calculate elapsed time
+  useEffect(() => {
+    if (!startTime) return;
+    
+    const interval = setInterval(() => {
+      const elapsed = Math.floor((Date.now() - startTime) / 1000);
+      setElapsedTime(elapsed);
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [startTime]);
+
+  const formatTime = (seconds: number): string => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
 
   // Module indicator: calculate which dimensions are complete/in-progress
   const getDimensionStatus = () => {
@@ -48,6 +83,7 @@ export default function Questionnaire({
   };
 
   const dimensionStatus = getDimensionStatus();
+  const motivationalMessage = getMotivationalMessage(currentIdx, questions.length);
 
   const options = [
     { value: 1, label: 'Totalmente en desacuerdo' },
@@ -73,11 +109,45 @@ export default function Questionnaire({
               <p className="text-xs text-slate-500">{currentIdx + 1} de {questions.length}</p>
             </div>
           </div>
-            <div className="text-right">
-            <div className="text-xs font-bold text-primary-600 uppercase tracking-widest">Puntos</div>
-            <div className="text-2xl font-black text-primary-600">{points}</div>
+            <div className="text-right flex items-center gap-4">
+            {onSaveSession && (
+              <button
+                onClick={onSaveSession}
+                className="flex items-center gap-2 px-4 py-2 bg-slate-100 hover:bg-slate-200 rounded-xl text-slate-600 text-sm font-semibold transition-all"
+                title="Guardar y continuar después"
+              >
+                <Save className="w-4 h-4" />
+                <span className="hidden sm:inline">Guardar</span>
+              </button>
+            )}
+            <div>
+              <div className="text-xs font-bold text-primary-600 uppercase tracking-widest">Puntos</div>
+              <div className="text-2xl font-black text-primary-600">{points}</div>
+            </div>
           </div>
         </div>
+
+        {/* Motivational Message */}
+        <motion.div
+          key={motivationalMessage}
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-4 text-center"
+        >
+          <p className="text-sm text-primary-600 font-semibold bg-primary-50 rounded-xl px-4 py-2 inline-block">
+            {motivationalMessage}
+          </p>
+        </motion.div>
+
+        {/* Time Invested Counter */}
+        {startTime && (
+          <div className="flex items-center justify-center gap-2 mb-4 text-slate-500">
+            <Clock className="w-4 h-4" />
+            <span className="text-sm font-medium">
+              Tiempo invertido: {formatTime(elapsedTime)}
+            </span>
+          </div>
+        )}
 
         {/* Module/Dimension Indicators */}
         <div className="flex flex-wrap gap-2 mb-6">
@@ -101,13 +171,28 @@ export default function Questionnaire({
           ))}
         </div>
 
-        {/* Progress Bar */}
-        <div className="w-full h-2 bg-slate-200 rounded-full mb-12 overflow-hidden">
-          <motion.div
-            initial={{ width: 0 }}
-            animate={{ width: `${progress}%` }}
-            className="h-full bg-primary-600"
-          />
+        {/* Progress Bar with Milestones */}
+        <div className="relative mb-12">
+          <div className="w-full h-2 bg-slate-200 rounded-full overflow-hidden">
+            <motion.div
+              initial={{ width: 0 }}
+              animate={{ width: `${progress}%` }}
+              className="h-full bg-primary-600"
+            />
+          </div>
+          {/* Milestone markers */}
+          {[8, 16, 24, 32, 40, 48].map((milestone) => (
+            <div
+              key={milestone}
+              className="absolute top-1/2 -translate-y-1/2 w-3 h-3 rounded-full border-2 border-white"
+              style={{
+                left: `${(milestone / questions.length) * 100}%`,
+                transform: 'translate(-50%, -50%)',
+                backgroundColor: currentIdx + 1 >= milestone ? '#2563eb' : '#e2e8f0'
+              }}
+              title={`Pregunta ${milestone}`}
+            />
+          ))}
         </div>
 
         {/* Question Card */}

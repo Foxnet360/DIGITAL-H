@@ -1,18 +1,65 @@
 <?php
-// Configuración de la base de datos MySQL - Hostinger
-// Valores hardcodeados porque las variables de entorno no están configuradas en Hostinger
-$DB_HOST = 'localhost';
-$DB_USER = 'u554044004_acruxuser';
-$DB_PASS = '4Crux2026*';
-$DB_NAME = 'u554044004_acruxdb';
+/**
+ * Configuración de DIGITAL-H - Usa configuración centralizada de acrux.life
+ * Este archivo ya no contiene credenciales hardcodeadas
+ */
 
-// Configuración SMTP
-$SMTP_HOST = 'smtp.hostinger.com';
-$SMTP_PORT = 465;
-$SMTP_SECURE = true;
-$SMTP_USER = 'hola@acrux.life';
-$SMTP_PASS = '4Crux2026*';
-$SMTP_FROM = 'DIGITAL-H <hola@acrux.life>';
+// Cargar configuración de acrux.life
+$acruxConfigPath = dirname(__DIR__) . '/../../../database/config.php';
+if (file_exists($acruxConfigPath)) {
+    $acruxConfig = require_once $acruxConfigPath;
+} else {
+    // Fallback por si acrux.life no está en la ruta esperada
+    $acruxConfig = null;
+}
+
+// Autoloader para PHPMailer
+$autoloadPaths = [
+    dirname(__DIR__) . '/../../../vendor/autoload.php',
+    dirname(__DIR__) . '/../../vendor/autoload.php',
+];
+
+$phpmailerAvailable = false;
+foreach ($autoloadPaths as $path) {
+    if (file_exists($path)) {
+        require_once $path;
+        $phpmailerAvailable = true;
+        break;
+    }
+}
+
+// Configuración de base de datos (usa acrux.life o fallback)
+if ($acruxConfig) {
+    $DB_HOST = $acruxConfig['database']['host'] ?? 'localhost';
+    $DB_USER = $acruxConfig['database']['user'] ?? '';
+    $DB_PASS = $acruxConfig['database']['password'] ?? '';
+    $DB_NAME = $acruxConfig['database']['dbname'] ?? '';
+} else {
+    // Fallback solo si no se encuentra la configuración de acrux.life
+    // En producción, esto no debería ocurrir
+    $DB_HOST = 'localhost';
+    $DB_USER = 'u554044004_acruxuser';
+    $DB_PASS = '4Crux2026*';
+    $DB_NAME = 'u554044004_acruxdb';
+}
+
+// Configuración SMTP desde acrux.life
+if ($acruxConfig) {
+    $SMTP_HOST = $acruxConfig['smtp']['host'] ?? 'smtp.hostinger.com';
+    $SMTP_PORT = $acruxConfig['smtp']['port'] ?? 465;
+    $SMTP_SECURE = ($acruxConfig['smtp']['encryption'] ?? 'ssl') === 'ssl';
+    $SMTP_USER = $acruxConfig['smtp']['username'] ?? '';
+    $SMTP_PASS = $acruxConfig['smtp']['password'] ?? '';
+    $SMTP_FROM = 'DIGITAL-H <' . ($acruxConfig['smtp']['from_email'] ?? 'hola@acrux.life') . '>';
+} else {
+    // Fallback
+    $SMTP_HOST = 'smtp.hostinger.com';
+    $SMTP_PORT = 465;
+    $SMTP_SECURE = true;
+    $SMTP_USER = 'hola@acrux.life';
+    $SMTP_PASS = '4Crux2026*';
+    $SMTP_FROM = 'DIGITAL-H <hola@acrux.life>';
+}
 
 // Función para conectar a la BD
 function getDBConnection() {
@@ -36,9 +83,9 @@ function sendJSON($data, $statusCode = 200) {
     exit;
 }
 
-// Función para enviar email mejorado
+// Función para enviar email mejorado con PHPMailer
 function sendThankYouEmail($email, $name, $company, $imd, $level) {
-    global $SMTP_HOST, $SMTP_PORT, $SMTP_SECURE, $SMTP_USER, $SMTP_PASS, $SMTP_FROM;
+    global $SMTP_HOST, $SMTP_PORT, $SMTP_SECURE, $SMTP_USER, $SMTP_PASS, $SMTP_FROM, $phpmailerAvailable;
     
     $userLevels = [
         'Inicial' => 'Explorador Digital',
@@ -222,13 +269,49 @@ function sendThankYouEmail($email, $name, $company, $imd, $level) {
     </html>
     ";
     
-    $headers = "MIME-Version: 1.0\r\n";
-    $headers .= "Content-Type: text/html; charset=UTF-8\r\n";
-    $headers .= "From: $SMTP_FROM\r\n";
-    $headers .= "Reply-To: hola@acrux.life\r\n";
-    $headers .= "X-Mailer: PHP/" . phpversion() . "\r\n";
-    
-    return mail($email, $subject, $html, $headers);
+    // Intentar usar PHPMailer si está disponible
+    if ($phpmailerAvailable && class_exists('PHPMailer\PHPMailer\PHPMailer')) {
+        try {
+            $mail = new PHPMailer\PHPMailer\PHPMailer(true);
+            
+            // Configuración SMTP
+            $mail->isSMTP();
+            $mail->Host = $SMTP_HOST;
+            $mail->Port = $SMTP_PORT;
+            $mail->SMTPAuth = true;
+            $mail->Username = $SMTP_USER;
+            $mail->Password = $SMTP_PASS;
+            $mail->SMTPSecure = $SMTP_SECURE ? 'ssl' : 'tls';
+            $mail->CharSet = 'UTF-8';
+            
+            // Remitente
+            $mail->setFrom($SMTP_USER, 'DIGITAL-H');
+            $mail->addReplyTo($SMTP_USER, 'Acrux Consultores');
+            
+            // Destinatario
+            $mail->addAddress($email, $name);
+            
+            // Contenido
+            $mail->isHTML(true);
+            $mail->Subject = $subject;
+            $mail->Body = $html;
+            
+            $mail->send();
+            return true;
+        } catch (Exception $e) {
+            error_log("Error enviando email con PHPMailer: " . $e->getMessage());
+            return false;
+        }
+    } else {
+        // Fallback a mail() nativo si PHPMailer no está disponible
+        $headers = "MIME-Version: 1.0\r\n";
+        $headers .= "Content-Type: text/html; charset=UTF-8\r\n";
+        $headers .= "From: $SMTP_FROM\r\n";
+        $headers .= "Reply-To: $SMTP_USER\r\n";
+        $headers .= "X-Mailer: PHP/" . phpversion() . "\r\n";
+        
+        return mail($email, $subject, $html, $headers);
+    }
 }
 
 // Función para calcular dimensiones
@@ -264,5 +347,31 @@ function calculateDimensions($answers) {
     }
     
     return $result;
+}
+
+// Función para calcular la dimensión más débil
+function calculateWeakDimension($answers) {
+    $dimensions = calculateDimensions($answers);
+    
+    $dimensionLabels = [
+        'strategy' => 'Estrategia',
+        'culture' => 'Cultura',
+        'talent' => 'Talento',
+        'tech' => 'Tecnología',
+        'process' => 'Procesos',
+        'wellbeing' => 'Bienestar'
+    ];
+    
+    $minValue = PHP_FLOAT_MAX;
+    $weakDimension = 'strategy';
+    
+    foreach ($dimensions as $key => $value) {
+        if ($value < $minValue) {
+            $minValue = $value;
+            $weakDimension = $key;
+        }
+    }
+    
+    return $dimensionLabels[$weakDimension] ?? 'Estrategia';
 }
 ?>

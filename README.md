@@ -1,321 +1,262 @@
-# DIGITAL-H: Diagnóstico de Madurez Digital
+# DIGITAL-H - Diagnóstico de Madurez Digital
 
-## 🎯 Descripción Oficial
+## 🎯 Sobre este Proyecto
 
-**DIGITAL-H** es una aplicación web interactiva de diagnóstico empresarial desarrollada exclusivamente para **Acrux Consultores** (`acrux.life`). La herramienta evalúa el nivel de madurez digital de organizaciones PYMEs mediante un cuestionario holístico de 48 preguntas distribuidas en 6 dimensiones críticas de transformación digital.
+DIGITAL-H es un **lead magnet** interactivo desarrollado por **Acrux Consultores** que permite a las empresas evaluar su nivel de madurez digital en 6 dimensiones críticas.
 
-### Características Principales
+### Ecosistema Acrux.life
 
-- **Diagnóstico Holístico**: 48 preguntas evaluando 6 dimensiones empresariales
-- **Gamificación**: Sistema de puntos y logros (badges) durante el cuestionario
-- **Reporte PDF Personalizado**: Generación automática de informes con gráficas de radar
-- **Análisis por Dimensiones**: Evaluación individualizada de cada área
-- **Hoja de Ruta Estratégica**: Recomendaciones priorizadas según el nivel de madurez
-- **Captura de Leads**: Formulario inteligente con consentimiento GDPR
-- **Email Automático**: Envío de agradecimiento con resultados al completar
-- **Persistencia de Sesión**: Posibilidad de pausar y continuar el diagnóstico
+Este proyecto forma parte del ecosistema de recursos digitales de Acrux:
 
-### Dimensiones Evaluadas
+```
+acrux.life/ (Landing principal)
+├── digital-h/     ← Este proyecto (Madurez Digital)
+└── pulso-h/       ← Diagnóstico de Bienestar Laboral
+```
 
-| Dimensión | Icono | Descripción |
-|-----------|-------|-------------|
-| **Estrategia Digital** | 🚀 | Visión, roadmap, alineación con negocio, gobernanza |
-| **Cultura y Liderazgo** | ❤️ | Mindset digital, liderazgo consciente, valores organizacionales |
-| **Talento y Competencias** | 👥 | People analytics, desarrollo, RRHH 4.0, habilidades digitales |
-| **Tecnología e Infraestructura** | 💻 | Stack tecnológico, ciberseguridad, integración, automatización |
-| **Procesos y Datos** | 📊 | Gestión de procesos, analítica de datos, toma de decisiones |
-| **Experiencia y Bienestar** | ⭐ | Engagement, bienestar humano, experiencia del empleado |
+**Independencia:** Cada proyecto es autónomo con su propio repositorio, pero comparten la identidad visual y el dominio principal.
 
 ---
 
-## 🏗️ Arquitectura del Proyecto
+## 🚀 Tecnologías
+
+- **Frontend:** React 19 + TypeScript + Vite
+- **Estilos:** Tailwind CSS v4
+- **Gráficos:** Recharts
+- **PDF:** jsPDF + html2canvas
+- **Backend:** PHP (API REST simple)
+- **Base de datos:** MySQL
+
+---
+
+## 📁 Estructura del Proyecto
 
 ```
 DIGITAL-H/
-├── src/                          # Código fuente React + TypeScript
-│   ├── components/               # Componentes React
-│   │   ├── Landing.tsx           # Página de inicio
-│   │   ├── Welcome.tsx           # Bienvenida al cuestionario
-│   │   ├── Questionnaire.tsx     # Cuestionario interactivo
-│   │   ├── LeadForm.tsx          # Formulario de captura de leads
-│   │   └── Results.tsx           # Resultados y reporte
-│   ├── types/                    # Definiciones de tipos TypeScript
-│   │   ├── types.ts              # Tipos principales
-│   │   └── shared.ts             # Tipos compartidos (Lead, DiagnosticRequest)
-│   ├── utils.ts                  # Utilidades (cálculo IMD, niveles)
-│   ├── levels.ts                 # Mapeo de niveles a etiquetas
-│   ├── constants.ts              # Preguntas, dimensiones, badges
-│   ├── sessionStorage.ts         # Persistencia de sesión en localStorage
-│   ├── generateReportPDF.ts      # Generador de PDF con jsPDF
-│   ├── db.ts                     # Conexión MySQL (desarrollo local)
-│   └── firebase.ts               # [REMOVIDO] Configuración Firebase
-├── public/digital-h/api/         # Backend PHP para producción
-│   ├── config.php                # Configuración BD y SMTP
-│   ├── diagnostic.php            # Endpoint: Guardar diagnóstico
-│   └── health.php                # Endpoint: Health check BD
-├── database/                     # Esquemas SQL
-│   └── digitalh_schema.sql       # Esquema de la tabla principal
-├── dist/                         # Build de producción (Vite)
-├── .env                          # Variables de entorno (no versionado)
-├── .env.example                  # Ejemplo de variables de entorno
-├── vite.config.ts                # Configuración Vite
-├── tsconfig.json                 # Configuración TypeScript
-├── package.json                  # Dependencias npm
-├── server.ts                     # Servidor Express (desarrollo local)
-└── deploy.sh                     # Script de despliegue
+├── src/
+│   ├── components/          # Componentes React
+│   │   ├── Landing.tsx      # Página de inicio
+│   │   ├── Questionnaire.tsx # Cuestionario 48 preguntas
+│   │   ├── LeadForm.tsx     # Formulario de captura
+│   │   └── Results.tsx      # Resultados y reporte
+│   ├── recommendations.ts   # Motor de recomendaciones
+│   ├── testimonials.ts      # Testimonios por nivel
+│   ├── utm-messages.ts      # Personalización UTM
+│   └── utils.ts             # Utilidades
+├── public/
+│   ├── api/                 # APIs PHP
+│   │   ├── diagnostic.php   # Guardar diagnóstico
+│   │   ├── health.php       # Health check
+│   │   └── config.php       # Configuración BD
+│   └── .htaccess            # Configuración Apache
+├── deploy.sh                # Script de despliegue
+└── package.json
 ```
 
 ---
 
-## 🚀 Cambios Realizados en esta Versión
+## 🛠️ Instalación Local
 
-### 1. Limpieza de Código y Dependencias
-
-**Eliminados (código muerto):**
-- ❌ `src/firebase.ts` - Firebase no se utilizaba en producción
-- ❌ `firebase-applet-config.json` - Configuración Firebase
-- ❌ `firebase-blueprint.json` - Blueprint Firebase
-- ❌ `firestore.rules` - Reglas Firestore
-- ❌ `useDebouncedSessionSave` de `sessionStorage.ts` - Hook no utilizado
-- ❌ `getCurrentDimension` de `App.tsx` - Función no utilizada
-- ❌ `getModuleProgress` de `App.tsx` - Función no utilizada
-- ❌ Imports sin usar en componentes (Layout, ShieldCheck, Users, Heart, Star)
-
-**Dependencias removidas:**
-- ❌ `firebase` (^12.11.0) - No utilizado
-- ❌ `html2canvas` (^1.4.1) - No utilizado (PDF usa jsPDF directamente)
-- ❌ `@google/genai` (^1.29.0) - No utilizado
-
-### 2. Centralización de Lógica
-
-**Unificación de lógica de niveles:**
-- ✅ Creado `src/levels.ts` con objeto `USER_LEVELS` centralizado
-- ✅ `Results.tsx` y `server.ts` ahora importan desde `levels.ts`
-- ✅ Eliminado `getDimensionLevel` de `generateReportPDF.ts` - ahora usa `getMaturityLevel` desde `utils.ts`
-- ✅ Eliminado `getUserLevelLabel` de `server.ts` - reemplazado por `USER_LEVELS`
-
-**Compartir tipos entre frontend y backend:**
-- ✅ Creado `src/types/shared.ts` con interfaces `Lead` y `DiagnosticRequest`
-- ✅ `src/types.ts` re-exporta desde `shared.ts`
-- ✅ `server.ts` importa tipos desde `./src/types/shared`
-- ✅ Eliminados todos los `any` en props de componentes principales
-
-### 3. Seguridad
-
-- ✅ Eliminadas credenciales hardcodeadas de `src/db.ts`
-- ✅ `db.ts` ahora requiere variables de entorno sin valores por defecto
-- ✅ `.env` configurado con todas las variables necesarias
-- ✅ Credenciales no expuestas en el código fuente
-
-### 4. Nuevas Características
-
-**Backend PHP para producción:**
-- ✅ `public/digital-h/api/config.php` - Configuración centralizada BD + SMTP
-- ✅ `public/digital-h/api/diagnostic.php` - API REST para guardar diagnósticos
-- ✅ `public/digital-h/api/health.php` - Health check de conexión a BD
-- ✅ `.htaccess` con configuración CORS, HTTPS y protección de archivos
-
-**Generación de PDF:**
-- ✅ Convertido logo de SVG a PNG para compatibilidad con jsPDF
-- ✅ PDF incluye portada, análisis por dimensiones, recomendaciones y hoja de ruta
-
-**Email de agradecimiento:**
-- ✅ Template HTML profesional con branding de Acrux
-- ✅ Envío automático al completar diagnóstico
-- ✅ Incluye IMD, nivel y descripción personalizada
-
-### 5. Correcciones de Bugs
-
-- ✅ Arreglado `bind_param` en PHP para tipos de datos correctos
-- ✅ Eliminadas columnas de dimensiones que no existían en BD
-- ✅ Corregido endpoint de API en frontend (`/digital-h/api/diagnostic.php`)
-- ✅ Optimizado bundle quitando dependencias innecesarias
-
----
-
-## 💻 Desarrollo Local
-
-### Requisitos Previos
-
-- Node.js 18+ 
-- MySQL 5.7+ o MariaDB
-- npm o yarn
-
-### Instalación
-
-1. Clonar repositorio:
 ```bash
-git clone <url-del-repositorio>
-cd DIGITAL-H
-```
+# 1. Clonar repositorio
+git clone <repo-url> digital-h
+cd digital-h
 
-2. Instalar dependencias:
-```bash
+# 2. Instalar dependencias
 npm install
-```
 
-3. Configurar variables de entorno:
-```bash
-cp .env.example .env
-# Editar .env con tus credenciales
-```
-
-4. Crear base de datos:
-```bash
-mysql -u root -p < database/digitalh_schema.sql
-```
-
-5. Iniciar servidor de desarrollo:
-```bash
+# 3. Iniciar servidor de desarrollo
 npm run dev
-```
 
-El frontend estará en `http://localhost:3000`
-El backend Express en `http://localhost:3001`
+# 4. Abrir en navegador
+# http://localhost:3000
+```
 
 ---
 
-## 🌐 Despliegue en Producción (Hostinger)
+## 🚀 Despliegue a Producción
 
-### Opción 1: PHP + Frontend Estático (Recomendada)
+### ⚠️ IMPORTANTE - Antes de Desplegar
 
-Esta opción usa el backend PHP incluido, ideal para hosting compartido:
+1. **Verifica que estás en la carpeta correcta** (`digital-h/`, no `pulso-h/`)
+2. **El script detectará automáticamente** si intentas desplegar en la ruta equivocada
+3. **Siempre se crea un backup** antes de sobrescribir
+
+### Comando de Despliegue
 
 ```bash
-# Compilar frontend
-npm run build
-
-# Copiar archivos al directorio de despliegue
-cp -r dist/* public/digital-h/
-
-# Subir a Hostinger (reemplazar con tus credenciales)
-scp -P 65002 -r public/digital-h/* u554044004@82.197.80.180:~/domains/acrux.life/public_html/digital-h/
+./deploy.sh
 ```
 
-### Estructura en Servidor
+### Lo que hace el script:
 
-```
-domains/acrux.life/public_html/digital-h/
-├── index.html              # Frontend compilado
-├── assets/                 # CSS, JS, imágenes
-├── api/
-│   ├── config.php          # Config BD y SMTP
-│   ├── diagnostic.php      # API guardar diagnósticos
-│   └── health.php          # Health check
-├── .htaccess               # Config Apache
-└── logo.png                # Logo para PDF
-```
+1. ✅ **Detecta** automáticamente el proyecto (DIGITAL-H vs PULSO-H)
+2. ✅ **Pregunta** el ambiente (producción o staging)
+3. ✅ **Valida** que no sobrescriba PULSO-H ni otros proyectos
+4. ✅ **Verifica** conexión SSH al servidor
+5. ✅ **Crea** backup automático antes de modificar
+6. ✅ **Corrige** automáticamente el `.htaccess` si es necesario
+7. ✅ **Build** del frontend optimizado
+8. ✅ **Despliega** solo los archivos necesarios
+9. ✅ **Verifica** que todo funcione post-deploy
 
-### Configuración de Variables de Entorno
+### URLs de Producción
 
-En tu panel de Hostinger, ve a **Advanced** → **Environment Variables**:
-
-```env
-DB_HOST=localhost
-DB_USER=tu_usuario_mysql
-DB_PASSWORD=tu_password_mysql
-DB_NAME=tu_base_datos
-SMTP_HOST=smtp.hostinger.com
-SMTP_PORT=465
-SMTP_SECURE=true
-SMTP_USER=tu_email@acrux.life
-SMTP_PASS=tu_password_email
-SMTP_FROM=DIGITAL-H <tu_email@acrux.life>
-```
-
-### Base de Datos
-
-Asegúrate de crear la tabla `digitalh_results`:
-
-```sql
-CREATE TABLE IF NOT EXISTS digitalh_results (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(255) NOT NULL,
-    email VARCHAR(255) NOT NULL,
-    company VARCHAR(255) NOT NULL,
-    company_size VARCHAR(50),
-    imd_score INT NOT NULL,
-    maturity_level VARCHAR(50) NOT NULL,
-    answers_json LONGTEXT,
-    dimension_strategy DECIMAL(5,2),
-    dimension_culture DECIMAL(5,2),
-    dimension_talent DECIMAL(5,2),
-    dimension_tech DECIMAL(5,2),
-    dimension_process DECIMAL(5,2),
-    dimension_wellbeing DECIMAL(5,2),
-    gdpr_consent TINYINT(1) DEFAULT 0,
-    gdpr_timestamp DATETIME,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-```
+- **Frontend:** https://acrux.life/digital-h/
+- **API:** https://acrux.life/digital-h/api/diagnostic.php
+- **Health Check:** https://acrux.life/digital-h/api/health.php
 
 ---
 
-## 🔌 API Endpoints
+## 🔗 Integración con Acrux.life
 
-### Guardar Diagnóstico
-- **URL**: `POST /digital-h/api/diagnostic.php`
-- **Content-Type**: `application/json`
-- **Body**:
-```json
-{
-  "email": "usuario@empresa.com",
-  "name": "Juan Pérez",
-  "company": "Empresa S.A.S",
-  "size": "51-250",
-  "imd": 72,
-  "level": "Avanzado",
-  "answers": {"E1.1": 4, "E1.2": 5, ...},
-  "gdprConsent": true,
-  "gdprTimestamp": 1713456000000
-}
+### Flujo de Usuario
+
+```
+Usuario llega a acrux.life
+        ↓
+[Call to Action] → "Evalúa tu madurez digital"
+        ↓
+https://acrux.life/digital-h/  ← DIGITAL-H
+        ↓
+Usuario completa diagnóstico (15-20 min)
+        ↓
+Recibe reporte PDF personalizado
+        ↓
+[CTA] → "Agendar consultoría gratuita"
+        ↓
+Calendly (30 min con equipo Acrux)
 ```
 
-### Health Check
-- **URL**: `GET /digital-h/api/health.php`
-- **Response**: `{"status":"ok","database":"connected"}`
+### Personalización por Canal (UTM)
+
+El sistema detecta automáticamente el origen del tráfico:
+
+| UTM Source | Mensaje Personalizado |
+|------------|----------------------|
+| instagram | "¿Viste nuestro contenido?" |
+| facebook | "Únete a las 50+ empresas..." |
+| google | "Diagnóstico gratuito..." |
+| email | "Bienvenido. Tu diagnóstico está listo" |
+| linkedin | "¿Tu empresa está lista?" |
+| orgánico | Mensaje por defecto |
+
+**Uso:** `https://acrux.life/digital-h/?utm_source=instagram`
 
 ---
 
-## 📊 Niveles de Madurez Digital
+## 📊 Métricas y Analytics
 
-| Nivel | IMD | Descripción |
-|-------|-----|-------------|
-| **Inicial** | ≤30% | Transformación digital no iniciada |
-| **Emergente** | 31-45% | Primeros pasos digitales |
-| **Desarrollo** | 46-60% | Transformación en curso |
-| **Avanzado** | 61-75% | Buena madurez digital |
-| **Excelente** | 76-90% | Alta madurez e innovación |
-| **Referente** | >90% | Excelencia digital |
+### Eventos Trackeados (gtag)
+
+| Evento | Descripción |
+|--------|-------------|
+| `digital_h_complete` | Diagnóstico completado |
+| `digital_h_leadform_start` | Usuario llega al formulario |
+| `digital_h_questionnaire_abandon` | Abandono durante cuestionario |
+| `digital_h_cta_click` | Click en cualquier CTA |
+
+### KPIs Principales
+
+- **Tasa de completitud:** % que termina las 48 preguntas
+- **Conversión LeadForm:** % que completa datos personales
+- **CTA Agenda:** Clicks en "Agendar consultoría"
+- **Distribución UTM:** Conversión por canal de adquisición
 
 ---
 
-## 🛠️ Scripts Disponibles
+## 🎨 Características UX Implementadas
+
+### 1. Flujo Adaptativo
+- ✅ LeadForm al final (no interrumpe cuestionario)
+- ✅ Guardar y continuar después
+- ✅ Recuperación de sesión automática
+
+### 2. Recomendaciones Contextuales
+- ✅ Basadas en las 2 dimensiones más débiles
+- ✅ Prioriza "quick wins" de bajo esfuerzo
+- ✅ 18 recomendaciones específicas por dimensión
+
+### 3. Prueba Social
+- ✅ 8 testimonios segmentados por nivel de madurez
+- ✅ Métricas concretas de resultados
+- ✅ Avatares genéricos profesionales
+
+### 4. Optimización de Conversión
+- ✅ CTA "Agendar" como primario visual
+- ✅ Sección persuasiva con bullet points
+- ✅ Tracking de clicks por ubicación
+
+---
+
+## 🛡️ Seguridad y Privacidad
+
+- ✅ **GDPR Compliant:** Checkbox de consentimiento explícito
+- ✅ **Datos cifrados:** MySQL con credenciales seguras
+- ✅ **Sin cookies:** Personalización UTM vía URL (sin tracking persistente)
+- ✅ **HTTPS forzado:** Redirección automática en .htaccess
+
+---
+
+## 🔄 Rollback
+
+Si algo sale mal después del deploy:
 
 ```bash
-npm run dev       # Servidor de desarrollo
-npm run build     # Compilar para producción
-npm run preview   # Previsualizar build
-npm run lint      # Verificar TypeScript
-npm run clean     # Limpiar carpeta dist
+# Conectar al servidor
+ssh -p 65002 u554044004@82.197.80.180
+
+# Ver backups disponibles
+ls ~/domains/acrux.life/public_html/ | grep backup
+
+# Restaurar backup (reemplazar BACKUP_NAME)
+cp -r ~/domains/acrux.life/public_html/BACKUP_NAME/* \
+     ~/domains/acrux.life/public_html/digital-h/
 ```
 
----
-
-## 📄 Licencia y Créditos
-
-**Desarrollado exclusivamente para Acrux Consultores**
-- 🌐 Web: https://acrux.life
-- 📧 Email: contacto@acrux.life
-- 📍 Ubicación: Armenia, Quindío, Colombia
-
-© 2025 Acrux Consultores - Todos los derechos reservados.
+El script de deploy crea automáticamente un backup antes de cada despliegue.
 
 ---
 
-## 🆘 Soporte
+## 🆘 Solución de Problemas
 
-Para soporte técnico o consultas sobre DIGITAL-H:
-- Revisa la documentación de despliegue: `DEPLOY_HOSTINGER.md`
-- Contacta al equipo de desarrollo de Acrux Consultores
-- Reporta issues en el repositorio de GitHub
+### Error: "Cannot redefine property: ethereum"
+Esto es normal, es una extensión de navegador (wallet crypto). No afecta el funcionamiento.
+
+### Error: MIME type ('text/html') para assets
+Verificar que el `.htaccess` tiene el `RewriteBase` correcto:
+```apache
+RewriteBase /digital-h/
+```
+
+### Página en blanco después de deploy
+1. Verificar en consola del navegador errores 404
+2. Confirmar que los archivos JS/CSS están en `assets/`
+3. Verificar que `index.html` apunta a las rutas correctas
+
+---
+
+## 📞 Soporte
+
+Para problemas de despliegue:
+1. Revisar logs: `ssh -p 65002 u554044004@82.197.80.180`
+2. Verificar backups en el servidor
+3. Contactar al equipo de desarrollo
+
+---
+
+## 📝 Changelog
+
+### 2026-05-04 - Optimización UX Mayor
+- ✅ LeadForm movido al final del flujo
+- ✅ Recomendaciones contextuales por dimensión
+- ✅ Personalización UTM por canal
+- ✅ Testimonios segmentados por madurez
+- ✅ Jerarquía visual de CTAs optimizada
+- ✅ Analytics mejorados (abandono, conversión)
+
+---
+
+**Desarrollado con ❤️ por el equipo de Acrux Consultores**
+
+**© 2026 - Todos los derechos reservados**

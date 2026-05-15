@@ -51,6 +51,9 @@ $answers = $data['answers'];
 $gdprConsent = $data['gdprConsent'] ?? false;
 $gdprTimestamp = $data['gdprTimestamp'] ?? null;
 
+// Calcular dimensión débil
+$weakDimension = calculateWeakDimension($answers);
+
 try {
     // Conectar a BD
     $conn = getDBConnection();
@@ -82,6 +85,43 @@ try {
     $stmt->execute();
     $insertId = $conn->insert_id;
     $stmt->close();
+    
+    // Registrar en email_sequences si tiene consentimiento GDPR
+    $sequenceId = null;
+    if ($gdprConsent) {
+        $sequenceStmt = $conn->prepare("
+            INSERT INTO email_sequences 
+            (email, name, company, sequence_type, status, current_step, next_send_at, 
+             digitalh_score, digitalh_maturity_level, dimension_weak, gdpr_consent, created_at, updated_at) 
+            VALUES (?, ?, ?, 'digital-h', 'active', 1, DATE_ADD(NOW(), INTERVAL 2 DAY), ?, ?, ?, 1, NOW(), NOW())
+            ON DUPLICATE KEY UPDATE
+            name = VALUES(name),
+            company = VALUES(company),
+            status = 'active',
+            current_step = 1,
+            next_send_at = DATE_ADD(NOW(), INTERVAL 2 DAY),
+            digitalh_score = VALUES(digitalh_score),
+            digitalh_maturity_level = VALUES(digitalh_maturity_level),
+            dimension_weak = VALUES(dimension_weak),
+            gdpr_consent = 1,
+            updated_at = NOW()
+        ");
+        
+        $sequenceStmt->bind_param(
+            "sssiss",
+            $email,
+            $name,
+            $company,
+            $imd,
+            $level,
+            $weakDimension
+        );
+        
+        $sequenceStmt->execute();
+        $sequenceId = $conn->insert_id;
+        $sequenceStmt->close();
+    }
+    
     $conn->close();
     
     // Enviar email de agradecimiento
@@ -91,6 +131,8 @@ try {
         'success' => true,
         'message' => 'Diagnostico guardado correctamente',
         'id' => $insertId,
+        'sequence_id' => $sequenceId,
+        'weak_dimension' => $weakDimension,
         'email_sent' => $emailSent
     ]);
     

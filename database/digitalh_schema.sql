@@ -88,6 +88,28 @@ SELECT
     created_at
 FROM digitalh_results;
 
+-- Tabla 3: Reservas de citas (calendario propio)
+CREATE TABLE IF NOT EXISTS digitalh_bookings (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    lead_email VARCHAR(255) NOT NULL,
+    lead_name VARCHAR(255) NOT NULL,
+    company VARCHAR(255) NOT NULL,
+    booking_date DATE NOT NULL,
+    booking_time TIME NOT NULL,
+    status ENUM('pending', 'confirmed', 'cancelled') DEFAULT 'pending',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    
+    -- Índices
+    INDEX idx_booking_date (booking_date),
+    INDEX idx_booking_time (booking_time),
+    INDEX idx_lead_email (lead_email),
+    INDEX idx_status (status),
+    
+    -- Evitar doble-booking
+    UNIQUE KEY unique_booking_slot (booking_date, booking_time, status)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 -- ============================================
 -- DATOS DE EJEMPLO (para testing)
 -- ============================================

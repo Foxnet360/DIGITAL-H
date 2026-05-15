@@ -6,3 +6,7 @@ coverage/
 *.log
 .env*
 !.env.example
+
+# Backup of old config with credentials
+public/digital-h/api/config.php.bak
+public/digital-h/api/config_backup.php

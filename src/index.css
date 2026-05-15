@@ -1,71 +1,8 @@
 @import url('https://fonts.googleapis.com/css2?family=Exo+2:ital,wght@0,100..900;1,100..900&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+@import "@acrux/design-tokens/theme.css";
 @import "tailwindcss";
 
 @theme {
-  /* Acrux Brand Palette */
-  --color-primary-50: #e8eef5;
-  --color-primary-100: #c5d4e6;
-  --color-primary-200: #9eb5d4;
-  --color-primary-300: #7796c2;
-  --color-primary-400: #5a7eb6;
-  --color-primary-500: #3d668a;
-  --color-primary-600: #1e3a5f;
-  --color-primary-700: #1a3252;
-  --color-primary-800: #162a45;
-  --color-primary-900: #122238;
-
-  --color-accent-50: #e6faff;
-  --color-accent-100: #b3f0ff;
-  --color-accent-200: #80e5ff;
-  --color-accent-300: #4ddbff;
-  --color-accent-400: #26d1ff;
-  --color-accent-500: #00c4f5;
-  --color-accent-600: #00d4ff;
-
-  --color-success: #10b981;
-  --color-warning: #f59e0b;
-  --color-error: #ef4444;
-
-  /* Override indigo with Acrux primary for backward compat */
-  --color-indigo-50: #e8eef5;
-  --color-indigo-100: #c5d4e6;
-  --color-indigo-200: #9eb5d4;
-  --color-indigo-300: #7796c2;
-  --color-indigo-400: #5a7eb6;
-  --color-indigo-500: #3d668a;
-  --color-indigo-600: #1e3a5f;
-  --color-indigo-700: #1a3252;
-  --color-indigo-800: #162a45;
-  --color-indigo-900: #122238;
-  --color-indigo-950: #0e1a2b;
-
-  /* Override slates with HEX to prevent OKLCH crash */
-  --color-slate-50: #f8fafc;
-  --color-slate-100: #f1f5f9;
-  --color-slate-200: #e2e8f0;
-  --color-slate-300: #cbd5e1;
-  --color-slate-400: #94a3b8;
-  --color-slate-500: #64748b;
-  --color-slate-600: #475569;
-  --color-slate-700: #334155;
-  --color-slate-800: #1f2937;
-  --color-slate-900: #1b1f3b;
-
-  /* Override Shadows to avoid OKLCH */
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
-  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
-  --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-  --shadow-inner: inset 0 2px 4px 0 rgba(0, 0, 0, 0.05);
-
-  /* Custom semantics */
-  --color-accent: #00d4ff;
-  --color-background: #fcfcfc;
-  --color-surface: #f0f4f8;
-
-  /* Fonts */
-  --font-sans: "Inter", system-ui, -apple-system, sans-serif;
-  --font-display: "Exo 2", system-ui, -apple-system, sans-serif;
+  /* Keep any overrides needed specific to DIGITAL-H */
+  --color-accent: var(--color-accent-400);
 }
