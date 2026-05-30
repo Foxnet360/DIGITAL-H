@@ -41,6 +41,11 @@ export function useDiagnostic() {
           industry: lead.industry || 'N/A',
           flow_version: 'v2_q48_capture'
         });
+        window.gtag('event', 'generate_lead', {
+          lead_source: 'digital-h',
+          value: imd,
+          currency: 'USD'
+        });
       }
 
       setLead({

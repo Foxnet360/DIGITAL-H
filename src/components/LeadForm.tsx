@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
-import { Mail, User, Building2, ChevronRight, ShieldCheck, FileText, BarChart3, Award, Zap, Clock, AlertTriangle, CheckCircle2 } from 'lucide-react';
+import { Mail, User, Building2, ChevronRight, ShieldCheck, FileText, BarChart3, Award, Zap, Clock, AlertTriangle, CheckCircle2, Phone, Briefcase, Factory, Users } from 'lucide-react';
 import PrivacyModal from './PrivacyModal';
 
 interface LeadFormProps {
@@ -22,7 +22,15 @@ export default function LeadForm({
     name: '',
     email: '',
     company: '',
-    gdprConsent: false
+    phone: '',
+    role: '',
+    industry: '',
+    size: '',
+    showOptional: false,
+    gdprConsent: false,
+    challenge: '',
+    contactMethod: '',
+    consultingInterest: false
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -95,15 +103,15 @@ export default function LeadForm({
       });
     }
 
-    // Enviar con campos opcionales vacíos para compatibilidad
+    // Enviar con campos opcionales para progressive profiling
     onSubmit({
       name: formData.name,
       email: formData.email,
-      phone: '',
+      phone: formData.phone || '',
       company: formData.company,
-      size: '',
-      role: '',
-      industry: '',
+      size: formData.size || '',
+      role: formData.role || '',
+      industry: formData.industry || '',
       gdprConsent: formData.gdprConsent,
       gdprTimestamp: Date.now()
     });
@@ -252,6 +260,149 @@ export default function LeadForm({
                   value={formData.company}
                   onChange={e => handleChange('company', e.target.value)}
                 />
+              </div>
+            </div>
+
+            {/* Progressive Profiling - Optional Fields */}
+            <div className="border-t border-slate-100 pt-4">
+              <button
+                type="button"
+                onClick={() => setFormData(prev => ({ ...prev, showOptional: !prev.showOptional }))}
+                className="flex items-center gap-2 text-sm text-primary-600 font-semibold hover:text-primary-700 transition-colors"
+              >
+                <ChevronRight className={`w-4 h-4 transition-transform ${formData.showOptional ? 'rotate-90' : ''}`} />
+                {formData.showOptional ? 'Ocultar campos opcionales' : 'Añadir más información (opcional)'}
+              </button>
+              
+              {formData.showOptional && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  className="space-y-4 pt-4"
+                >
+                  {/* Phone */}
+                  <div className="space-y-1">
+                    <label className="text-sm font-bold text-slate-700 ml-1">Teléfono <span className="text-slate-400 font-normal">(opcional)</span></label>
+                    <input
+                      type="tel"
+                      placeholder="+57 300 123 4567"
+                      className="w-full px-4 py-3.5 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all"
+                      value={formData.phone || ''}
+                      onChange={e => handleChange('phone', e.target.value)}
+                    />
+                  </div>
+                  
+                  {/* Role */}
+                  <div className="space-y-1">
+                    <label className="text-sm font-bold text-slate-700 ml-1">Cargo <span className="text-slate-400 font-normal">(opcional)</span></label>
+                    <select
+                      className="w-full px-4 py-3.5 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all"
+                      value={formData.role || ''}
+                      onChange={e => handleChange('role', e.target.value)}
+                    >
+                      <option value="">Selecciona tu cargo</option>
+                      <option value="ceo">CEO / Director General</option>
+                      <option value="director">Director / Gerente</option>
+                      <option value="manager">Manager / Jefe</option>
+                      <option value="coordinator">Coordinador / Especialista</option>
+                      <option value="other">Otro</option>
+                    </select>
+                  </div>
+                  
+                  {/* Industry */}
+                  <div className="space-y-1">
+                    <label className="text-sm font-bold text-slate-700 ml-1">Industria <span className="text-slate-400 font-normal">(opcional)</span></label>
+                    <select
+                      className="w-full px-4 py-3.5 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all"
+                      value={formData.industry || ''}
+                      onChange={e => handleChange('industry', e.target.value)}
+                    >
+                      <option value="">Selecciona tu industria</option>
+                      <option value="tecnologia">Tecnología</option>
+                      <option value="manufactura">Manufactura</option>
+                      <option value="salud">Salud</option>
+                      <option value="finanzas">Finanzas</option>
+                      <option value="educacion">Educación</option>
+                      <option value="retail">Retail</option>
+                      <option value="servicios">Servicios</option>
+                      <option value="otros">Otros</option>
+                    </select>
+                  </div>
+                  
+                  {/* Company Size */}
+                  <div className="space-y-1">
+                    <label className="text-sm font-bold text-slate-700 ml-1">Tamaño de empresa <span className="text-slate-400 font-normal">(opcional)</span></label>
+                    <select
+                      className="w-full px-4 py-3.5 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all"
+                      value={formData.size || ''}
+                      onChange={e => handleChange('size', e.target.value)}
+                    >
+                      <option value="">Selecciona el tamaño</option>
+                      <option value="1-10">1-10 empleados</option>
+                      <option value="11-50">11-50 empleados</option>
+                      <option value="51-200">51-200 empleados</option>
+                      <option value="201-500">201-500 empleados</option>
+                      <option value="500+">500+ empleados</option>
+                    </select>
+                  </div>
+                </motion.div>
+              )}
+            </div>
+
+            {/* Qualification Fields */}
+            <div className="border-t border-slate-100 pt-4">
+              <h3 className="text-sm font-bold text-slate-700 mb-3">Ayúdanos a entender mejor tus necesidades (opcional)</h3>
+              
+              {/* Challenge */}
+              <div className="space-y-1 mb-4">
+                <label className="text-sm font-bold text-slate-700 ml-1">¿Cuál es tu mayor desafío actual?</label>
+                <select
+                  className="w-full px-4 py-3.5 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all"
+                  value={formData.challenge || ''}
+                  onChange={e => handleChange('challenge', e.target.value)}
+                >
+                  <option value="">Selecciona una opción</option>
+                  <option value="adopcion-tecnologia">Adopción de tecnología</option>
+                  <option value="cambio-cultural">Cambio cultural</option>
+                  <option value="resistencia-cambio">Resistencia al cambio</option>
+                  <option value="claridad-estrategica">Falta de claridad estratégica</option>
+                  <option value="bienestar-equipo">Bienestar del equipo</option>
+                  <option value="otros">Otros</option>
+                </select>
+              </div>
+              
+              {/* Contact Method */}
+              <div className="space-y-2 mb-4">
+                <label className="text-sm font-bold text-slate-700 ml-1">¿Cómo prefieres que te contactemos?</label>
+                <div className="flex gap-4">
+                  {['Email', 'WhatsApp', 'Llamada'].map(method => (
+                    <label key={method} className="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="radio"
+                        name="contactMethod"
+                        value={method}
+                        checked={formData.contactMethod === method}
+                        onChange={e => handleChange('contactMethod', e.target.value)}
+                        className="w-4 h-4 text-primary-600 border-slate-300 focus:ring-primary-500"
+                      />
+                      <span className="text-sm text-slate-700">{method}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+              
+              {/* Consulting Interest */}
+              <div className="flex items-start space-x-3">
+                <input
+                  id="consultingInterest"
+                  type="checkbox"
+                  checked={formData.consultingInterest}
+                  onChange={e => handleChange('consultingInterest', e.target.checked)}
+                  className="mt-1 w-5 h-5 rounded border-2 cursor-pointer border-slate-300"
+                />
+                <label htmlFor="consultingInterest" className="text-sm text-slate-600 cursor-pointer leading-relaxed">
+                  Me interesa recibir una consultoría gratuita de 30 minutos para interpretar mis resultados.
+                </label>
               </div>
             </div>
 

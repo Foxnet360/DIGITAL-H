@@ -74,6 +74,56 @@ npm run dev
 
 ---
 
+## 🐳 Entorno Docker (Desarrollo Completo)
+
+Para desarrollo con backend PHP y base de datos MySQL local:
+
+```bash
+# 1. Iniciar contenedores (PHP-Apache, MySQL, phpMyAdmin)
+docker-compose up -d
+
+# 2. Verificar que los servicios están corriendo
+# - Frontend/API: http://localhost:8080
+# - phpMyAdmin: http://localhost:8081
+# - MySQL: localhost:3306
+
+# 3. Ver logs
+ocker-compose logs -f
+
+# 4. Detener contenedores
+docker-compose down
+
+# 5. Detener y eliminar volúmenes (reset de BD)
+docker-compose down -v
+```
+
+### Servicios Docker
+
+| Servicio | Puerto | Descripción |
+|----------|--------|-------------|
+| PHP-Apache | 8080 | Servidor web con API PHP |
+| MySQL | 3306 | Base de datos local |
+| phpMyAdmin | 8081 | Administración de BD |
+
+### Credenciales Docker MySQL
+
+- **Database:** `digitalh_db`
+- **User:** `digitalh_user`
+- **Password:** `digitalh_pass`
+- **Root Password:** `root_password`
+
+### Desarrollo Frontend Independiente
+
+El frontend puede ejecutarse sin Docker:
+
+```bash
+npm run dev
+# http://localhost:3000 (frontend)
+# http://localhost:8080 (API PHP en Docker)
+```
+
+---
+
 ## 🚀 Despliegue a Producción
 
 ### ⚠️ IMPORTANTE - Antes de Desplegar

@@ -4,7 +4,7 @@ import { Radar, RadarChart, PolarGrid, PolarAngleAxis, ResponsiveContainer } fro
 import { 
   Download, Calendar, ChevronRight, Award, TrendingUp, 
   X, CheckCircle2, ExternalLink, BookOpen, 
-  Map, Linkedin, Phone
+  Map, Linkedin, Phone, ArrowRight, Compass
 } from 'lucide-react';
 import { DIMENSIONS } from '../constants';
 import { getMaturityLevel, getWeakDimensions, getRecommendations, getTestimonials } from '../utils';
@@ -628,6 +628,78 @@ export default function Results({ answers, lead }: ResultsProps) {
           </div>
         )}
       </AnimatePresence>
+
+      {/* Next Steps Section */}
+      <div className="max-w-6xl mx-auto mt-16">
+        <div className="bg-white rounded-2xl shadow-lg border border-slate-100 p-8">
+          <h2 className="font-display text-2xl font-bold text-slate-900 text-center mb-8">
+            ¿Quieres profundizar en tus resultados?
+          </h2>
+          
+          <div className="grid md:grid-cols-3 gap-6">
+            {/* Calendly */}
+            <a
+              href="https://calendly.com/acrux-consultores/30min"
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => {
+                if (window.gtag) window.gtag('event', 'digital_h_cta_click', { type: 'calendly' });
+              }}
+              className="group bg-primary-50 rounded-xl p-6 hover:bg-primary-100 transition-colors cursor-pointer"
+            >
+              <div className="w-12 h-12 bg-primary-600 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                <Calendar className="w-6 h-6 text-white" />
+              </div>
+              <h3 className="font-semibold text-slate-900 mb-2">Agendar consultoría</h3>
+              <p className="text-sm text-slate-600 mb-4">30 minutos gratuitos para interpretar tus resultados con un consultor.</p>
+              <span className="inline-flex items-center text-primary-600 text-sm font-semibold">
+                Agendar ahora
+                <ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
+              </span>
+            </a>
+
+            {/* Services */}
+            <a
+              href="https://acrux.life/soluciones"
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => {
+                if (window.gtag) window.gtag('event', 'digital_h_cta_click', { type: 'services' });
+              }}
+              className="group bg-accent-50 rounded-xl p-6 hover:bg-accent-100 transition-colors cursor-pointer"
+            >
+              <div className="w-12 h-12 bg-accent rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                <Compass className="w-6 h-6 text-white" />
+              </div>
+              <h3 className="font-semibold text-slate-900 mb-2">Ver soluciones</h3>
+              <p className="text-sm text-slate-600 mb-4">Conoce cómo ayudamos a empresas como la tuya a transformar su cultura.</p>
+              <span className="inline-flex items-center text-accent text-sm font-semibold">
+                Explorar
+                <ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
+              </span>
+            </a>
+
+            {/* PDF */}
+            <button
+              onClick={() => {
+                handleDownloadPDF();
+                if (window.gtag) window.gtag('event', 'digital_h_pdf_download');
+              }}
+              className="group bg-emerald-50 rounded-xl p-6 hover:bg-emerald-100 transition-colors text-left w-full"
+            >
+              <div className="w-12 h-12 bg-emerald-600 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                <Download className="w-6 h-6 text-white" />
+              </div>
+              <h3 className="font-semibold text-slate-900 mb-2">Descargar informe</h3>
+              <p className="text-sm text-slate-600 mb-4">Obtén tu reporte completo en PDF para compartir con tu equipo.</p>
+              <span className="inline-flex items-center text-emerald-600 text-sm font-semibold">
+                Descargar
+                <ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
+              </span>
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

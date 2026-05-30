@@ -1,0 +1,57 @@
+version: '3.8'
+
+services:
+  php-apache:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:80"
+    volumes:
+      - ./public:/var/www/html
+      - ./docker-config.php:/var/www/html/api/config.php:ro
+    environment:
+      - DB_HOST=mysql
+      - DB_USER=digitalh_user
+      - DB_PASS=digitalh_pass
+      - DB_NAME=digitalh_db
+    depends_on:
+      - mysql
+    networks:
+      - digitalh-network
+
+  mysql:
+    image: mysql:8.0
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=root_password
+      - MYSQL_DATABASE=digitalh_db
+      - MYSQL_USER=digitalh_user
+      - MYSQL_PASSWORD=digitalh_pass
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./database/digitalh_schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
+    networks:
+      - digitalh-network
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    ports:
+      - "8081:80"
+    environment:
+      - PMA_HOST=mysql
+      - PMA_PORT=3306
+      - PMA_USER=digitalh_user
+      - PMA_PASSWORD=digitalh_pass
+    depends_on:
+      - mysql
+    networks:
+      - digitalh-network
+
+volumes:
+  mysql-data:
+
+networks:
+  digitalh-network:
+    driver: bridge

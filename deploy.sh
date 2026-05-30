@@ -3,6 +3,8 @@
 # =============================================================================
 # Script de Despliegue DIGITAL-H - Ecosistema Acrux.life
 # =============================================================================
+# ⚠️  DEPRECADO: Este script está obsoleto. Use acrux.life/deploy.sh --digital-h
+# =============================================================================
 # Este script garantiza un despliegue seguro y correcto del lead magnet
 # DIGITAL-H, preservando la integridad del ecosistema acrux.life
 # =============================================================================
