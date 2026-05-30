@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { AnimatePresence } from 'motion/react';
 import { QUESTIONS } from './constants';
 import { saveSession, clearSession } from './sessionStorage';
 import { Lead } from './types';
@@ -13,6 +12,7 @@ import { useGameState } from './hooks/useGameState';
 import { useSession } from './hooks/useSession';
 import { useQuestionnaire } from './hooks/useQuestionnaire';
 import { useDiagnostic } from './hooks/useDiagnostic';
+import { useViewTransition } from './hooks/useViewTransition';
 
 import BadgeNotification from './components/BadgeNotification';
 import ResumePrompt from './components/ResumePrompt';
@@ -32,7 +32,7 @@ export default function App() {
 
   const { currentIdx, setCurrentIdx, answers, setAnswers, handleAnswer, handleNext } = useQuestionnaire(() => {
     if (!lead) {
-      setScreen('leadform');
+      transitionToScreen('leadform');
       if (window.gtag) {
         const utmSource = new URLSearchParams(window.location.search).get('utm_source') || 'organico';
         window.gtag('event', 'digital_h_leadform_start', {
@@ -42,13 +42,21 @@ export default function App() {
         });
       }
     } else {
-      finishDiagnostic(answers, lead, setLead, setScreen);
+      finishDiagnostic(answers, lead, setLead, transitionToScreen);
     }
   });
 
   const { points, unlockedBadges, setUnlockedBadges, showBadge, setShowBadge } = useGameState(answers);
   const { showResumePrompt, setShowResumePrompt, loadSession } = useSession(answers, currentIdx, points, unlockedBadges, screen);
   const { finishDiagnostic } = useDiagnostic();
+  const { transition } = useViewTransition();
+
+  // Helper para transicionar entre pantallas con View Transitions
+  const transitionToScreen = (newScreen: Screen) => {
+    transition(() => {
+      setScreen(newScreen);
+    });
+  };
 
   // Track questionnaire abandonment
   useEffect(() => {
@@ -70,7 +78,7 @@ export default function App() {
 
   const handleLeadSubmit = (data: any) => {
     setLead(data);
-    finishDiagnostic(answers, data, setLead, setScreen);
+    finishDiagnostic(answers, data, setLead, transitionToScreen);
   };
 
   const handleResume = () => {
@@ -80,7 +88,7 @@ export default function App() {
       setCurrentIdx(session.currentIdx);
       // points and badges will recalculate via useGameState hook
       setQuestionnaireStartTime(Date.now());
-      setScreen('questionnaire');
+      transitionToScreen('questionnaire');
     }
     setShowResumePrompt(false);
   };
@@ -91,7 +99,7 @@ export default function App() {
     setCurrentIdx(0);
     // points and badges auto recalculate
     setLead(null);
-    setScreen('landing');
+    transitionToScreen('landing');
     setShowResumePrompt(false);
   };
 
@@ -110,19 +118,18 @@ export default function App() {
   };
 
   return (
-    <div className="font-sans text-slate-900 bg-background min-h-screen flex flex-col">
+    <div className="font-sans text-slate-900 bg-background min-h-screen flex flex-col" data-view-transition>
       <FunnelHeader onVolverClick={handleVolverClick} title="Acrux | DIGITAL-H" />
 
-      <AnimatePresence mode="wait">
         {screen === 'landing' && (
           <Landing onStart={() => {
-            setScreen('pretest');
+            transitionToScreen('pretest');
           }} />
         )}
         {screen === 'pretest' && (
           <PreTestScreen onStart={() => {
             setQuestionnaireStartTime(Date.now());
-            setScreen('questionnaire');
+            transitionToScreen('questionnaire');
           }} />
         )}
         {screen === 'questionnaire' && (
@@ -150,7 +157,6 @@ export default function App() {
         {screen === 'results' && (
           <Results answers={answers} lead={lead} />
         )}
-      </AnimatePresence>
 
       <ResumePrompt show={showResumePrompt} onResume={handleResume} onRestart={handleRestart} />
       <BadgeNotification showBadge={showBadge} onClose={() => setShowBadge(null)} />

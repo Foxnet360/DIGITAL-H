@@ -227,7 +227,7 @@ export default function Results({ answers, lead }: ResultsProps) {
             <div className="space-y-4 pt-4">
               {/* CTA Primario: Agendar consultoría */}
               <a
-                href="https://calendly.com/acrux-life/30min"
+                href="https://calendly.com/acrux-consultores/30min"
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={() => {
@@ -425,7 +425,7 @@ export default function Results({ answers, lead }: ResultsProps) {
               </ul>
             </div>
             <a
-              href="https://calendly.com/acrux-life/30min"
+              href="https://calendly.com/acrux-consultores/30min"
               target="_blank"
               rel="noopener noreferrer"
               onClick={() => {
