@@ -285,7 +285,7 @@ export default function LeadForm({
                     <label className="text-sm font-bold text-slate-700 ml-1">Teléfono <span className="text-slate-400 font-normal">(opcional)</span></label>
                     <input
                       type="tel"
-                      placeholder="+57 300 123 4567"
+                      placeholder="+57 XXX XXX XXXX"
                       className="w-full px-4 py-3.5 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all"
                       value={formData.phone || ''}
                       onChange={e => handleChange('phone', e.target.value)}
