@@ -1,5 +1,5 @@
 import React from 'react';
-import { Shield, Lock, CheckCircle } from 'lucide-react';
+import { Shield, Lock, CheckCircle, Mail } from 'lucide-react';
 
 export default function FunnelFooter() {
   return (
@@ -8,8 +8,8 @@ export default function FunnelFooter() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
           {/* Brand */}
           <div>
-            <a href="https://acrux.life" className="inline-block mb-2">
-              <span className="block font-display font-bold text-white text-lg tracking-tight">Acrux Consultores</span>
+            <a href="https://acrux.life" className="inline-block mb-4">
+              <img src="/acrux_logo.svg" alt="ACRUX Consultores" className="h-8 w-auto" />
             </a>
             <p className="text-white/60 text-sm mt-2">
               Parte de ACRUX Consultores
@@ -17,6 +17,13 @@ export default function FunnelFooter() {
             <p className="text-white/40 text-xs mt-1">
               Arquitectos de Sistemas Humanos
             </p>
+            <a
+              href="mailto:hola@acrux.life"
+              className="inline-flex items-center gap-2 text-sm text-white/70 hover:text-white transition-colors mt-4"
+            >
+              <Mail className="w-4 h-4 text-accent" />
+              hola@acrux.life
+            </a>
           </div>
           
           {/* Product */}

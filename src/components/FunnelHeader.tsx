@@ -26,7 +26,7 @@ export default function FunnelHeader({ onVolverClick, title = "Acrux Consultores
                 href="https://acrux.life" 
                 onClick={handleVolver}
               >
-                <img src="/acrux_logo_white.svg" alt="ACRUX" className="h-8 md:h-10 w-auto" />
+                <img src="/acrux_logo.svg" alt="ACRUX" className="h-8 md:h-10 w-auto" />
                 <span className="text-white/40 hidden md:inline">|</span>
                 <span className="block font-display font-bold tracking-tight text-white text-xl leading-7">
                   {title}
