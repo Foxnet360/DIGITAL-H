@@ -264,8 +264,8 @@ export default function PreTestScreen({ onStart }: PreTestScreenProps) {
           <button
             onClick={handleStart}
             disabled={!gdprConsent}
-            className="inline-flex items-center gap-2 bg-accent text-white px-8 py-4 rounded-full 
-                       font-semibold hover:bg-accent/90 transition-colors disabled:opacity-50 
+            className="inline-flex items-center gap-2 bg-primary text-white px-8 py-4 rounded-full 
+                       font-semibold hover:bg-primary/90 transition-colors disabled:opacity-50 
                        disabled:cursor-not-allowed text-lg"
           >
             Comenzar diagnóstico

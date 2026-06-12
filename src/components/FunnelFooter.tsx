@@ -11,15 +11,15 @@ export default function FunnelFooter() {
             <a href="https://acrux.life" className="inline-block mb-4">
               <img src="/acrux_logo.svg" alt="ACRUX Consultores" className="h-8 w-auto" />
             </a>
-            <p className="text-white/60 text-sm mt-2">
+            <p className="text-white/80 text-sm mt-2">
               Parte de ACRUX Consultores
             </p>
-            <p className="text-white/40 text-xs mt-1">
+            <p className="text-white/80 text-xs mt-1">
               Arquitectos de Sistemas Humanos
             </p>
             <a
               href="mailto:hola@acrux.life"
-              className="inline-flex items-center gap-2 text-sm text-white/70 hover:text-white transition-colors mt-4"
+              className="inline-flex items-center gap-2 text-sm text-white/80 hover:text-white transition-colors mt-4"
             >
               <Mail className="w-4 h-4 text-accent" />
               hola@acrux.life
@@ -29,7 +29,7 @@ export default function FunnelFooter() {
           {/* Product */}
           <div>
             <h4 className="font-semibold text-white mb-4 text-sm uppercase tracking-wider">DIGITAL-H</h4>
-            <ul className="space-y-2 text-sm text-white/70">
+            <ul className="space-y-2 text-sm text-white/80">
               <li><a href="/" className="hover:text-white transition-colors">Inicio</a></li>
               <li><a href="/" className="hover:text-white transition-colors">Hacer diagnóstico</a></li>
               <li><a href="https://acrux.life/soluciones" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">Nuestros servicios</a></li>
@@ -39,7 +39,7 @@ export default function FunnelFooter() {
           {/* Legal */}
           <div>
             <h4 className="font-semibold text-white mb-4 text-sm uppercase tracking-wider">Legal</h4>
-            <ul className="space-y-2 text-sm text-white/70">
+            <ul className="space-y-2 text-sm text-white/80">
               <li><a href="https://acrux.life/privacidad" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">Política de Privacidad</a></li>
               <li><a href="https://acrux.life/terminos" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">Términos y Condiciones</a></li>
               <li><a href="https://acrux.life/cookies" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">Política de Cookies</a></li>
@@ -49,7 +49,7 @@ export default function FunnelFooter() {
           {/* Trust */}
           <div>
             <h4 className="font-semibold text-white mb-4 text-sm uppercase tracking-wider">Confianza</h4>
-            <ul className="space-y-2 text-sm text-white/70">
+            <ul className="space-y-2 text-sm text-white/80">
               <li className="flex items-center gap-2">
                 <Shield className="w-4 h-4 text-accent" />
                 Datos encriptados
@@ -66,7 +66,7 @@ export default function FunnelFooter() {
           </div>
         </div>
         
-        <div className="border-t border-white/10 pt-8 text-center text-sm text-white/40">
+        <div className="border-t border-white/10 pt-8 text-center text-sm text-white/80">
           <p>© {new Date().getFullYear()} ACRUX Consultores. Todos los derechos reservados.</p>
         </div>
       </div>

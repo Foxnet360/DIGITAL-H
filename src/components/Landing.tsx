@@ -117,7 +117,7 @@ export default function Landing({ onStart }: LandingProps) {
           <p className="text-primary-700 text-sm">
             <span className="font-semibold">Parte de ACRUX Consultores.</span>{' '}
             Este diagnóstico es el primer paso de nuestra metodología de{' '}
-            <a href="https://acrux.life/metodologia" target="_blank" rel="noopener noreferrer" className="text-accent underline">
+            <a href="https://acrux.life/metodologia" target="_blank" rel="noopener noreferrer" className="text-primary-700 underline">
               Transformación Cultural
             </a>.
           </p>
@@ -187,7 +187,7 @@ export default function Landing({ onStart }: LandingProps) {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.7 }}
-                className="flex items-center justify-center gap-2 text-sm text-orange-600 font-medium"
+                className="flex items-center justify-center gap-2 text-sm text-orange-800 font-semibold"
               >
                 <TrendingUp className="w-4 h-4" />
                 <span>{diagnosticCount} diagnósticos completados esta semana</span>

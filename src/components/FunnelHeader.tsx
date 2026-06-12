@@ -43,7 +43,7 @@ export default function FunnelHeader({ onVolverClick, title = "Acrux Consultores
               </a>
               <a 
                 href="https://acrux.life/contacto"
-                className="bg-accent text-white px-4 py-2 rounded-full text-sm font-semibold hover:bg-accent/90 transition-colors"
+                className="bg-accent text-primary-900 font-bold px-4 py-2 rounded-full text-sm hover:bg-accent/90 transition-colors"
               >
                 Contactar consultor
               </a>
