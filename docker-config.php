@@ -1,14 +1,14 @@
 <?php
-// Configuración de la base de datos MySQL - Hostinger
-$DB_HOST = 'localhost';
-$DB_USER = 'u554044004_acruxuser';
-$DB_PASS = '4Crux2026*';
-$DB_NAME = 'u554044004_acruxdb';
+// Configuración de la base de datos MySQL - Docker Environment
+$DB_HOST = getenv('DB_HOST') ?: 'mysql';
+$DB_USER = getenv('DB_USER') ?: 'digitalh_user';
+$DB_PASS = getenv('DB_PASS') ?: 'digitalh_pass';
+$DB_NAME = getenv('DB_NAME') ?: 'digitalh_db';
 
-// Configuración SMTP - Hostinger
+// Configuración SMTP - Deshabilitado en Docker local
 $SMTP_HOST = 'smtp.hostinger.com';
 $SMTP_PORT = 465;
-$SMTP_SECURE = true; // SSL
+$SMTP_SECURE = true;
 $SMTP_USER = 'hola@acrux.life';
 $SMTP_PASS = '4Crux2026*';
 $SMTP_FROM = 'DIGITAL-H <hola@acrux.life>';
@@ -231,8 +231,6 @@ function sendThankYouEmail($email, $name, $company, $imd, $level) {
     $headers .= "X-Mailer: PHP/" . phpversion() . "\r\n";
     $headers .= "X-Priority: 3\r\n";
     
-    // En Hostinger, mail() usa el SMTP configurado automáticamente
-    // pero a veces necesita el Return-Path correcto
     $additional_params = "-f hola@acrux.life";
     
     return mail($email, $subject, $html, $headers, $additional_params);

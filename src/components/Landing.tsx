@@ -60,6 +60,25 @@ export default function Landing({ onStart }: LandingProps) {
 
   const headline = utmMessages.headline;
   const subheadline = utmMessages.subheadline;
+  const [diagnosticCount, setDiagnosticCount] = useState<number | null>(null);
+
+  // Fetch real diagnostic count for urgency
+  useEffect(() => {
+    const fetchCount = async () => {
+      try {
+        const response = await fetch('./api/stats.php?type=weekly_count');
+        if (response.ok) {
+          const data = await response.json();
+          if (data.count !== undefined) {
+            setDiagnosticCount(data.count);
+          }
+        }
+      } catch {
+        // Silently fail - urgency indicator is optional
+      }
+    };
+    fetchCount();
+  }, []);
 
   return (
     <div className="min-h-screen flex flex-col relative overflow-hidden">
@@ -91,6 +110,19 @@ export default function Landing({ onStart }: LandingProps) {
           </div>
         </div>
       </motion.div>
+
+      {/* Context Bridge */}
+      <div className="bg-primary-50 py-4 border-y border-primary-100 relative z-10">
+        <div className="max-w-4xl mx-auto px-4 text-center">
+          <p className="text-primary-700 text-sm">
+            <span className="font-semibold">Parte de ACRUX Consultores.</span>{' '}
+            Este diagnóstico es el primer paso de nuestra metodología de{' '}
+            <a href="https://acrux.life/metodologia" target="_blank" rel="noopener noreferrer" className="text-primary-700 underline">
+              Transformación Cultural
+            </a>.
+          </p>
+        </div>
+      </div>
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col items-center justify-center p-4 sm:p-6 text-center relative z-10 pt-4">
@@ -148,6 +180,19 @@ export default function Landing({ onStart }: LandingProps) {
               {utmMessages.ctaText}
               <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </motion.button>
+            
+            {/* Urgency Indicator */}
+            {diagnosticCount !== null && diagnosticCount > 0 && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.7 }}
+                className="flex items-center justify-center gap-2 text-sm text-orange-800 font-semibold"
+              >
+                <TrendingUp className="w-4 h-4" />
+                <span>{diagnosticCount} diagnósticos completados esta semana</span>
+              </motion.div>
+            )}
             
             <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-slate-500">
               <span className="flex items-center gap-1.5">

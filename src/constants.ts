@@ -21,7 +21,7 @@ export const DIMENSIONS: Dimension[] = [
     id: 'talento',
     name: 'Talento y Competencias',
     description: 'People analytics, desarrollo, RRHH 4.0, habilidades digitales',
-    color: '#5fe8ff', // Cyan (Accent)
+    color: '#F5A623', // Warm Yellow (Accent)
     icon: 'Users',
     badge: 'Talent Keeper'
   },

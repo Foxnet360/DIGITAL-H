@@ -188,7 +188,7 @@ function sendThankYouEmail($email, $name, $company, $imd, $level) {
             
             <!-- CTA -->
             <div style=\"text-align: center; margin: 32px 0;\">
-                <a href=\"https://calendly.com/acrux-life/30min\" style=\"display: inline-block; background: linear-gradient(135deg, #1e3a5f 0%, #2e86ab 100%); color: white; padding: 18px 36px; text-decoration: none; border-radius: 12px; font-weight: 700; font-size: 16px; margin-bottom: 12px;\">📅 Agendar Consultoría Gratuita</a>
+                <a href=\"https://calendly.com/acrux-consultores/30min\" style=\"display: inline-block; background: linear-gradient(135deg, #1e3a5f 0%, #2e86ab 100%); color: white; padding: 18px 36px; text-decoration: none; border-radius: 12px; font-weight: 700; font-size: 16px; margin-bottom: 12px;\">📅 Agendar Consultoría Gratuita</a>
                 <p style=\"font-size: 13px; color: #94a3b8; margin: 8px 0 0 0;\">Sesión de 30 minutos para profundizar en tus resultados</p>
             </div>
             

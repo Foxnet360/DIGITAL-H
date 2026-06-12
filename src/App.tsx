@@ -1,25 +1,27 @@
 import React, { useState, useEffect } from 'react';
-import { AnimatePresence } from 'motion/react';
 import { QUESTIONS } from './constants';
 import { saveSession, clearSession } from './sessionStorage';
 import { Lead } from './types';
 import Landing from './components/Landing';
+import PreTestScreen from './components/PreTestScreen';
 import Questionnaire from './components/Questionnaire';
 import LeadForm from './components/LeadForm';
 import Results from './components/Results';
-import { ArrowLeft } from 'lucide-react';
 
 import { useGameState } from './hooks/useGameState';
 import { useSession } from './hooks/useSession';
 import { useQuestionnaire } from './hooks/useQuestionnaire';
 import { useDiagnostic } from './hooks/useDiagnostic';
+import { useViewTransition } from './hooks/useViewTransition';
 
 import BadgeNotification from './components/BadgeNotification';
 import ResumePrompt from './components/ResumePrompt';
 import SaveModal from './components/SaveModal';
 import ExitModal from './components/ExitModal';
+import FunnelHeader from './components/FunnelHeader';
+import FunnelFooter from './components/FunnelFooter';
 
-type Screen = 'landing' | 'questionnaire' | 'leadform' | 'results';
+type Screen = 'landing' | 'pretest' | 'questionnaire' | 'leadform' | 'results';
 
 export default function App() {
   const [screen, setScreen] = useState<Screen>('landing');
@@ -30,7 +32,7 @@ export default function App() {
 
   const { currentIdx, setCurrentIdx, answers, setAnswers, handleAnswer, handleNext } = useQuestionnaire(() => {
     if (!lead) {
-      setScreen('leadform');
+      transitionToScreen('leadform');
       if (window.gtag) {
         const utmSource = new URLSearchParams(window.location.search).get('utm_source') || 'organico';
         window.gtag('event', 'digital_h_leadform_start', {
@@ -40,13 +42,21 @@ export default function App() {
         });
       }
     } else {
-      finishDiagnostic(answers, lead, setLead, setScreen);
+      finishDiagnostic(answers, lead, setLead, transitionToScreen);
     }
   });
 
   const { points, unlockedBadges, setUnlockedBadges, showBadge, setShowBadge } = useGameState(answers);
   const { showResumePrompt, setShowResumePrompt, loadSession } = useSession(answers, currentIdx, points, unlockedBadges, screen);
   const { finishDiagnostic } = useDiagnostic();
+  const { transition } = useViewTransition();
+
+  // Helper para transicionar entre pantallas con View Transitions
+  const transitionToScreen = (newScreen: Screen) => {
+    transition(() => {
+      setScreen(newScreen);
+    });
+  };
 
   // Track questionnaire abandonment
   useEffect(() => {
@@ -68,7 +78,7 @@ export default function App() {
 
   const handleLeadSubmit = (data: any) => {
     setLead(data);
-    finishDiagnostic(answers, data, setLead, setScreen);
+    finishDiagnostic(answers, data, setLead, transitionToScreen);
   };
 
   const handleResume = () => {
@@ -78,7 +88,7 @@ export default function App() {
       setCurrentIdx(session.currentIdx);
       // points and badges will recalculate via useGameState hook
       setQuestionnaireStartTime(Date.now());
-      setScreen('questionnaire');
+      transitionToScreen('questionnaire');
     }
     setShowResumePrompt(false);
   };
@@ -89,7 +99,7 @@ export default function App() {
     setCurrentIdx(0);
     // points and badges auto recalculate
     setLead(null);
-    setScreen('landing');
+    transitionToScreen('landing');
     setShowResumePrompt(false);
   };
 
@@ -108,47 +118,18 @@ export default function App() {
   };
 
   return (
-    <div className="font-sans text-slate-900 bg-background min-h-screen flex flex-col">
-      {/* Universal Top Navigation for Acrux */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-sm py-4 shadow-sm transition-all duration-300">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex-shrink-0 flex items-center">
-              <a className="flex items-center gap-2 md:gap-3" href="https://acrux.life" onClick={handleVolverClick}>
-                <img src="./acrux_logo.svg" alt="ACRUX" className="h-8 md:h-10 w-auto" />
-                <span className="block font-display font-bold tracking-tight text-slate-900 text-xl leading-7">
-                  Acrux Consultores
-                </span>
-              </a>
-            </div>
-            <div className="hidden lg:flex items-center space-x-8">
-              <a 
-                href="https://acrux.life" 
-                className="bg-primary-600 text-white px-6 py-2.5 rounded-full text-sm font-bold font-display shadow-lg hover:shadow-xl hover:bg-primary-600/90 transition-all duration-300 transform hover:scale-105 flex items-center gap-2"
-              >
-                Volver a Acrux
-                <ArrowLeft className="w-4 h-4" />
-              </a>
-            </div>
-            <div className="lg:hidden">
-              <a 
-                href="https://acrux.life" 
-                onClick={handleVolverClick}
-                className="text-sm font-semibold text-primary-600 hover:text-primary-700 transition-colors p-2"
-              >
-                <ArrowLeft className="w-5 h-5" />
-              </a>
-            </div>
-          </div>
-        </div>
-      </nav>
-      <div className="h-24" />
+    <div className="font-sans text-slate-900 bg-background min-h-screen flex flex-col" data-view-transition>
+      <FunnelHeader onVolverClick={handleVolverClick} title="Acrux | DIGITAL-H" />
 
-      <AnimatePresence mode="wait">
         {screen === 'landing' && (
           <Landing onStart={() => {
+            transitionToScreen('pretest');
+          }} />
+        )}
+        {screen === 'pretest' && (
+          <PreTestScreen onStart={() => {
             setQuestionnaireStartTime(Date.now());
-            setScreen('questionnaire');
+            transitionToScreen('questionnaire');
           }} />
         )}
         {screen === 'questionnaire' && (
@@ -176,7 +157,6 @@ export default function App() {
         {screen === 'results' && (
           <Results answers={answers} lead={lead} />
         )}
-      </AnimatePresence>
 
       <ResumePrompt show={showResumePrompt} onResume={handleResume} onRestart={handleRestart} />
       <BadgeNotification showBadge={showBadge} onClose={() => setShowBadge(null)} />
@@ -191,16 +171,7 @@ export default function App() {
       />
 
       {screen !== 'questionnaire' && (
-      <footer className="w-full bg-slate-900 border-t border-slate-800 py-8 mt-auto z-10">
-        <div className="max-w-6xl mx-auto px-6 flex flex-col items-center">
-          <p className="text-slate-400 text-sm font-semibold mb-2">
-            Desarrollado de manera exclusiva para <a href="https://acrux.life" className="text-accent-400 hover:text-accent-300 transition-colors">acrux.life</a>
-          </p>
-          <p className="text-slate-500 text-xs">
-            © {new Date().getFullYear()} Todos los derechos reservados.
-          </p>
-        </div>
-      </footer>
+        <FunnelFooter />
       )}
     </div>
   );
