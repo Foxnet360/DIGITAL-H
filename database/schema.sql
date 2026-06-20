@@ -1,6 +1,7 @@
 -- Tabla para almacenar diagnósticos DIGITAL-H
 CREATE TABLE IF NOT EXISTS digitalh_diagnosticos (
   id INT AUTO_INCREMENT PRIMARY KEY,
+  share_token VARCHAR(36) NOT NULL DEFAULT '',
   nombre VARCHAR(255) NOT NULL,
   email VARCHAR(255) NOT NULL,
   empresa VARCHAR(255) NOT NULL,
@@ -12,5 +13,6 @@ CREATE TABLE IF NOT EXISTS digitalh_diagnosticos (
   gdpr_timestamp DATETIME,
   fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   INDEX idx_email (email),
-  INDEX idx_fecha (fecha_creacion)
+  INDEX idx_fecha (fecha_creacion),
+  INDEX idx_share_token (share_token)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

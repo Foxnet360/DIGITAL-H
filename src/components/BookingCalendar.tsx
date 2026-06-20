@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { Calendar, Clock, CheckCircle2, AlertTriangle, Phone } from 'lucide-react';
+import { trackEvent } from '../utils/analytics';
 
 interface BookingCalendarProps {
   leadEmail: string;
@@ -93,12 +94,10 @@ export default function BookingCalendar({ leadEmail, leadName, company }: Bookin
       setBookingConfirmed(true);
       
       // Track booking
-      if (window.gtag) {
-        window.gtag('event', 'digital_h_booking_created', {
-          flow_version: 'v2_q48_capture',
-          booking_date: selectedDate.toISOString().split('T')[0]
-        });
-      }
+      trackEvent('digital_h_booking_created', {
+        flow_version: 'v2_q48_capture',
+        booking_date: selectedDate.toISOString().split('T')[0]
+      });
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error desconocido');
     } finally {

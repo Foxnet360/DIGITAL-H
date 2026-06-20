@@ -3,6 +3,7 @@
  * Centralized GA4 event tracking for the conversion funnel
  * Following PULSO-H pattern for consistency
  */
+import * as Sentry from '@sentry/react';
 
 // GA4 Event Names
 export const GA4_EVENTS = {
@@ -40,9 +41,25 @@ interface GA4EventParams {
  * Track a GA4 event
  */
 export const trackEvent = (eventName: string, params?: GA4EventParams): void => {
-  if (typeof window !== 'undefined' && (window as any).gtag) {
-    (window as any).gtag('event', eventName, params);
+  if (typeof window === 'undefined') return;
+
+  if (!(window as any).gtag) {
+    if (import.meta.env.DEV) {
+      // Dev: warn so misconfigured environments are caught early
+      console.warn('[analytics] gtag not available:', eventName, params);
+    } else {
+      // Prod: breadcrumb for observability without alert noise
+      Sentry.addBreadcrumb({
+        category: 'analytics',
+        message: `gtag not available: ${eventName}`,
+        data: params,
+        level: 'info',
+      });
+    }
+    return;
   }
+
+  (window as any).gtag('event', eventName, params);
 };
 
 /**
@@ -105,8 +122,13 @@ export const trackQuestionnaireAbandon = (progress: number, questionNumber: numb
   });
 };
 
-export const trackLeadformStart = (): void => {
-  trackEvent(GA4_EVENTS.LEADFORM_START);
+export const trackLeadformStart = (completionRate?: number): void => {
+  trackEvent(GA4_EVENTS.LEADFORM_START, {
+    utm_source: getUtmParam('utm_source'),
+    utm_medium: getUtmParam('utm_medium'),
+    utm_campaign: getUtmParam('utm_campaign'),
+    ...(completionRate !== undefined && { question_completion_rate: completionRate }),
+  });
 };
 
 export const trackLeadformSubmit = (challenge?: string, contactMethod?: string): void => {

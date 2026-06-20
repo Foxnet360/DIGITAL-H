@@ -4,10 +4,15 @@ import { ArrowLeft } from 'lucide-react';
 interface FunnelHeaderProps {
   onVolverClick?: (e: React.MouseEvent) => void;
   title?: string;
+  showBackButton?: boolean;
 }
 
-export default function FunnelHeader({ onVolverClick, title = "Acrux Consultores" }: FunnelHeaderProps) {
+export default function FunnelHeader({ onVolverClick, title = "Acrux Consultores", showBackButton = true }: FunnelHeaderProps) {
   const handleVolver = (e: React.MouseEvent) => {
+    if (!showBackButton) {
+      e.preventDefault();
+      return;
+    }
     if (onVolverClick) {
       onVolverClick(e);
     } else {
@@ -21,26 +26,38 @@ export default function FunnelHeader({ onVolverClick, title = "Acrux Consultores
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex-shrink-0 flex items-center">
-              <a 
-                className="flex items-center gap-2 md:gap-3" 
-                href="https://acrux.life" 
-                onClick={handleVolver}
-              >
-                <img src="/acrux_logo.svg" alt="ACRUX" className="h-8 md:h-10 w-auto" />
-                <span className="text-white/40 hidden md:inline">|</span>
-                <span className="block font-display font-bold tracking-tight text-white text-xl leading-7">
-                  {title}
-                </span>
-              </a>
+              {showBackButton ? (
+                <a 
+                  className="flex items-center gap-2 md:gap-3" 
+                  href="https://acrux.life" 
+                  onClick={handleVolver}
+                >
+                  <img src="/acrux_logo.svg" alt="ACRUX" className="h-8 md:h-10 w-auto" />
+                  <span className="text-white/40 hidden md:inline">|</span>
+                  <span className="block font-display font-bold tracking-tight text-white text-xl leading-7">
+                    {title}
+                  </span>
+                </a>
+              ) : (
+                <div className="flex items-center gap-2 md:gap-3">
+                  <img src="/acrux_logo.svg" alt="ACRUX" className="h-8 md:h-10 w-auto" />
+                  <span className="text-white/40 hidden md:inline">|</span>
+                  <span className="block font-display font-bold tracking-tight text-white text-xl leading-7">
+                    {title}
+                  </span>
+                </div>
+              )}
             </div>
             <div className="hidden lg:flex items-center space-x-6">
-              <a 
-                href="https://acrux.life" 
-                onClick={handleVolver}
-                className="text-white/70 hover:text-white text-sm transition-colors"
-              >
-                Volver a Acrux
-              </a>
+              {showBackButton && (
+                <a 
+                  href="https://acrux.life" 
+                  onClick={handleVolver}
+                  className="text-white/70 hover:text-white text-sm transition-colors"
+                >
+                  Volver a Acrux
+                </a>
+              )}
               <a 
                 href="https://acrux.life/contacto"
                 className="bg-accent text-primary-900 font-bold px-4 py-2 rounded-full text-sm hover:bg-accent/90 transition-colors"
@@ -49,13 +66,15 @@ export default function FunnelHeader({ onVolverClick, title = "Acrux Consultores
               </a>
             </div>
             <div className="lg:hidden">
-              <a 
-                href="https://acrux.life" 
-                onClick={handleVolver}
-                className="text-white/70 hover:text-white p-2 flex items-center"
-              >
-                <ArrowLeft className="w-5 h-5" />
-              </a>
+              {showBackButton && (
+                <a 
+                  href="https://acrux.life" 
+                  onClick={handleVolver}
+                  className="text-white/70 hover:text-white p-2 flex items-center"
+                >
+                  <ArrowLeft className="w-5 h-5" />
+                </a>
+              )}
             </div>
           </div>
         </div>

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { Mail, User, Building2, ChevronRight, ShieldCheck, FileText, BarChart3, Award, Zap, Clock, AlertTriangle, CheckCircle2, Phone, Briefcase, Factory, Users } from 'lucide-react';
 import PrivacyModal from './PrivacyModal';
+import { trackEvent } from '../utils/analytics';
 
 interface LeadFormProps {
   onSubmit: (data: { name: string; email: string; phone: string; company: string; size: string; role: string; industry: string; gdprConsent: boolean; gdprTimestamp: number }) => void;
@@ -96,12 +97,10 @@ export default function LeadForm({
     await new Promise(resolve => setTimeout(resolve, 500));
     
     // Track lead form submission
-    if (window.gtag) {
-      window.gtag('event', 'digital_h_start', {
-        company_size: 'N/A',
-        industry: 'N/A'
-      });
-    }
+    trackEvent('digital_h_start', {
+      company_size: 'N/A',
+      industry: 'N/A'
+    });
 
     // Enviar con campos opcionales para progressive profiling
     onSubmit({

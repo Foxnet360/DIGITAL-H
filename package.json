@@ -8,7 +8,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "clean": "rm -rf dist",
-    "lint": "tsc --noEmit && npx eslint .",
+    "lint": "tsc --noEmit && npx -y eslint .",
     "test": "vitest",
     "test:run": "vitest run"
   },

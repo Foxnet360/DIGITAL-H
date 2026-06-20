@@ -7,6 +7,8 @@ import PreTestScreen from './components/PreTestScreen';
 import Questionnaire from './components/Questionnaire';
 import LeadForm from './components/LeadForm';
 import Results from './components/Results';
+import PublicResultsPage from './components/PublicResultsPage';
+import { trackLeadformStart, trackQuestionnaireAbandon } from './utils/analytics';
 
 import { useGameState } from './hooks/useGameState';
 import { useSession } from './hooks/useSession';
@@ -21,7 +23,7 @@ import ExitModal from './components/ExitModal';
 import FunnelHeader from './components/FunnelHeader';
 import FunnelFooter from './components/FunnelFooter';
 
-type Screen = 'landing' | 'pretest' | 'questionnaire' | 'leadform' | 'results';
+type Screen = 'landing' | 'pretest' | 'questionnaire' | 'leadform' | 'results' | 'public-results';
 
 export default function App() {
   const [screen, setScreen] = useState<Screen>('landing');
@@ -29,18 +31,15 @@ export default function App() {
   const [showExitModal, setShowExitModal] = useState(false);
   const [showSaveModal, setShowSaveModal] = useState(false);
   const [questionnaireStartTime, setQuestionnaireStartTime] = useState<number | undefined>(undefined);
+  const [publicResultsId, setPublicResultsId] = useState<string>('');
+  const [publicResultsToken, setPublicResultsToken] = useState<string>('');
 
   const { currentIdx, setCurrentIdx, answers, setAnswers, handleAnswer, handleNext } = useQuestionnaire(() => {
     if (!lead) {
       transitionToScreen('leadform');
-      if (window.gtag) {
-        const utmSource = new URLSearchParams(window.location.search).get('utm_source') || 'organico';
-        window.gtag('event', 'digital_h_leadform_start', {
-          utm_source: utmSource,
-          question_completion_rate: Math.round((Object.keys(answers).length / QUESTIONS.length) * 100),
-          flow_version: 'v2_q48_capture'
-        });
-      }
+      trackLeadformStart(
+        Math.round((Object.keys(answers).length / QUESTIONS.length) * 100)
+      );
     } else {
       finishDiagnostic(answers, lead, setLead, transitionToScreen);
     }
@@ -58,18 +57,31 @@ export default function App() {
     });
   };
 
+  // Check URL hash for shared results on mount
+  useEffect(() => {
+    const handleHashRoute = () => {
+      const hash = window.location.hash;
+      const match = hash.match(/^#results\/(\d+)\/([a-f0-9-]+)$/i);
+      if (match) {
+        setPublicResultsId(match[1]);
+        setPublicResultsToken(match[2]);
+        setScreen('public-results');
+      }
+    };
+
+    handleHashRoute();
+    window.addEventListener('hashchange', handleHashRoute);
+    return () => window.removeEventListener('hashchange', handleHashRoute);
+  }, []);
+
   // Track questionnaire abandonment
   useEffect(() => {
     const handleBeforeUnload = () => {
       if (screen === 'questionnaire' && currentIdx < QUESTIONS.length - 1) {
-        if (window.gtag) {
-          window.gtag('event', 'digital_h_questionnaire_abandon', {
-            question_number: currentIdx + 1,
-            total_questions: QUESTIONS.length,
-            progress_percentage: Math.round(((currentIdx + 1) / QUESTIONS.length) * 100),
-            flow_version: 'v2_q48_capture'
-          });
-        }
+        trackQuestionnaireAbandon(
+          Math.round(((currentIdx + 1) / QUESTIONS.length) * 100),
+          currentIdx + 1
+        );
       }
     };
     window.addEventListener('beforeunload', handleBeforeUnload);
@@ -119,7 +131,11 @@ export default function App() {
 
   return (
     <div className="font-sans text-slate-900 bg-background min-h-screen flex flex-col" data-view-transition>
-      <FunnelHeader onVolverClick={handleVolverClick} title="Acrux | DIGITAL-H" />
+      <FunnelHeader 
+        onVolverClick={handleVolverClick} 
+        title="Acrux | DIGITAL-H" 
+        showBackButton={screen !== 'public-results'} 
+      />
 
         {screen === 'landing' && (
           <Landing onStart={() => {
@@ -155,7 +171,10 @@ export default function App() {
           />
         )}
         {screen === 'results' && (
-          <Results answers={answers} lead={lead} />
+          <Results answers={answers} lead={lead!} />
+        )}
+        {screen === 'public-results' && (
+          <PublicResultsPage id={publicResultsId} token={publicResultsToken} />
         )}
 
       <ResumePrompt show={showResumePrompt} onResume={handleResume} onRestart={handleRestart} />

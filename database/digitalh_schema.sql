@@ -6,6 +6,7 @@
 -- Tabla 1: Resultados de diagnósticos DIGITAL-H
 CREATE TABLE IF NOT EXISTS digitalh_results (
     id INT AUTO_INCREMENT PRIMARY KEY,
+    share_token VARCHAR(36) NOT NULL DEFAULT '',
     -- Datos del participante
     name VARCHAR(255) NOT NULL,
     email VARCHAR(255) NOT NULL,
@@ -43,7 +44,8 @@ CREATE TABLE IF NOT EXISTS digitalh_results (
     INDEX idx_maturity_level (maturity_level),
     INDEX idx_imd_score (imd_score),
     INDEX idx_created_at (created_at),
-    INDEX idx_status (status)
+    INDEX idx_status (status),
+    INDEX idx_share_token (share_token)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Tabla 2: Eventos/acciones del usuario (opcional, para analytics)

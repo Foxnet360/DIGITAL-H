@@ -1,6 +1,7 @@
 import { calculateIMD, getMaturityLevel } from '../utils';
 import { clearSession } from '../sessionStorage';
 import { Lead } from '../types';
+import { trackEvent, trackLeadformComplete } from '../utils/analytics';
 
 export function useDiagnostic() {
   const finishDiagnostic = async (answers: Record<string, number>, lead: Lead, setLead: (lead: Lead) => void, setScreen: (screen: any) => void) => {
@@ -33,26 +34,30 @@ export function useDiagnostic() {
       const result = await response.json();
 
       // Track diagnostic completion
-      if (window.gtag) {
-        window.gtag('event', 'digital_h_complete', {
-          score: imd,
-          level: level.name,
-          company_size: lead.size,
-          industry: lead.industry || 'N/A',
-          flow_version: 'v2_q48_capture'
-        });
-        window.gtag('event', 'generate_lead', {
-          lead_source: 'digital-h',
-          value: imd,
-          currency: 'USD'
-        });
-      }
+      // Note: using 'digital_h_complete' (not GA4_EVENTS.QUESTIONNAIRE_COMPLETE)
+      // to preserve historical GA4 event name and avoid breaking existing reports.
+      trackEvent('digital_h_complete', {
+        score: imd,
+        level: level.name,
+        company_size: lead.size,
+        industry: (lead as any).industry || 'N/A',
+        flow_version: 'v2_q48_capture',
+      });
+      trackLeadformComplete(imd, level.name);
+
+      const id = result.id;
+      const shareToken = result.share_token;
+      const shareUrl = `${window.location.origin}${window.location.pathname}#results/${id}/${shareToken}`;
 
       setLead({
         ...lead,
         score: imd,
         level: level.name,
-        id: result.id,
+        id,
+        share_token: shareToken,
+        diagnosticId: id,
+        shareToken: shareToken,
+        shareUrl,
       });
 
       clearSession(); // clear session on completion

@@ -5,6 +5,7 @@ import {
   ArrowRight, Clock, FileText, TrendingUp, CheckCircle2,
   FileCheck, Lock, ExternalLink
 } from 'lucide-react';
+import { trackPretestView, trackPretestAccept } from '../utils/analytics';
 
 interface PreTestScreenProps {
   onStart: () => void;
@@ -67,18 +68,11 @@ export default function PreTestScreen({ onStart }: PreTestScreenProps) {
 
   useEffect(() => {
     // Track pretest view
-    if (window.gtag) {
-      window.gtag('event', 'digital_h_pretest_view');
-    }
+    trackPretestView();
   }, []);
 
   const handleStart = () => {
-    if (window.gtag) {
-      window.gtag('event', 'digital_h_pretest_accept', {
-        gdpr_consent: gdprConsent,
-        marketing_consent: marketingConsent
-      });
-    }
+    trackPretestAccept(gdprConsent, marketingConsent);
     onStart();
   };
 
