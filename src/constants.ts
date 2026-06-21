@@ -4,7 +4,7 @@ export const DIMENSIONS: Dimension[] = [
   {
     id: 'estrategia',
     name: 'Estrategia Digital',
-    description: 'Visión, roadmap, alineación con negocio, gobernanza',
+    description: 'Evalúa la visión digital a largo plazo, el roadmap de iniciativas, su alineación con los objetivos de negocio y el modelo de gobernanza tecnológica.',
     color: '#2e86ab', // Teal (Primary)
     icon: 'Rocket',
     badge: 'Estratega'
@@ -12,7 +12,7 @@ export const DIMENSIONS: Dimension[] = [
   {
     id: 'cultura',
     name: 'Cultura y Liderazgo',
-    description: 'Mindset digital, liderazgo consciente, valores organizacionales',
+    description: 'Mide el mindset digital de la organización, la adaptabilidad al cambio, el liderazgo consciente y el fomento de la innovación interna.',
     color: '#1b1f3b', // Navy (Secondary)
     icon: 'Heart',
     badge: 'Cultivador'
@@ -20,7 +20,7 @@ export const DIMENSIONS: Dimension[] = [
   {
     id: 'talento',
     name: 'Talento y Competencias',
-    description: 'People analytics, desarrollo, RRHH 4.0, habilidades digitales',
+    description: 'Analiza las capacidades técnicas de los colaboradores, los planes de formación continua, el uso de analítica en RRHH y las habilidades digitales.',
     color: '#F5A623', // Warm Yellow (Accent)
     icon: 'Users',
     badge: 'Talent Keeper'
@@ -28,7 +28,7 @@ export const DIMENSIONS: Dimension[] = [
   {
     id: 'tecnologia',
     name: 'Tecnología e Infraestructura',
-    description: 'Stack tecnológico, ciberseguridad, integración, automatización',
+    description: 'Examina la escalabilidad y seguridad del stack tecnológico, el uso de infraestructura cloud y el nivel de integración de herramientas.',
     color: '#3586ab', // Teal shade
     icon: 'Cpu',
     badge: 'Tech Master'
@@ -36,7 +36,7 @@ export const DIMENSIONS: Dimension[] = [
   {
     id: 'procesos',
     name: 'Procesos y Datos',
-    description: 'Gestión de procesos, analítica de datos, toma de decisiones',
+    description: 'Evalúa la digitalización y automatización de flujos de trabajo, la gobernanza de datos y la capacidad para tomar decisiones basadas en analítica.',
     color: '#174a62', // Dark Teal
     icon: 'BarChart3',
     badge: 'Data Driver'
@@ -44,7 +44,7 @@ export const DIMENSIONS: Dimension[] = [
   {
     id: 'bienestar',
     name: 'Experiencia y Bienestar',
-    description: 'Engagement, bienestar humano, experiencia del empleado',
+    description: 'Mide el nivel de engagement de los colaboradores, el bienestar humano en entornos híbridos y el diseño de la experiencia del empleado.',
     color: '#88c1d8', // Soft Teal
     icon: 'Star',
     badge: 'Wellness Champion'

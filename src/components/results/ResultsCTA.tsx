@@ -18,9 +18,7 @@ export function ResultsHeroCTAs({ lead, answers, shareUrl }: CTAProps) {
     <div className="space-y-4 pt-4">
       {/* CTA Primario: Agendar consultoría */}
       <a
-        href="https://calendly.com/acrux-consultores/30min"
-        target="_blank"
-        rel="noopener noreferrer"
+        href="#booking-section"
         onClick={() => {
           trackEvent('digital_h_cta_click', {
             cta_type: 'schedule_consultation',
@@ -31,7 +29,7 @@ export function ResultsHeroCTAs({ lead, answers, shareUrl }: CTAProps) {
         className="w-full md:w-auto px-8 py-4 bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-2xl font-bold text-lg flex items-center justify-center shadow-xl shadow-primary-200 hover:shadow-2xl hover:scale-105 transition-all duration-300"
       >
         <Phone className="w-6 h-6 mr-3" />
-        Reservar mi sesión de 30 min con Psicólogo Organizacional
+        Reservar mi sesión de 30 min con profesionales
       </a>
       
       <div className="flex flex-wrap gap-3 justify-center md:justify-start">
@@ -92,9 +90,7 @@ export function ResultsPersuasiveCTA() {
           </ul>
         </div>
         <a
-          href="https://calendly.com/acrux-consultores/30min"
-          target="_blank"
-          rel="noopener noreferrer"
+          href="#booking-section"
           onClick={() => {
             trackEvent('digital_h_cta_click', {
               cta_type: 'schedule_consultation',
@@ -105,8 +101,7 @@ export function ResultsPersuasiveCTA() {
           className="px-10 py-5 bg-white text-primary-700 rounded-2xl font-bold text-lg flex items-center gap-3 hover:scale-105 hover:shadow-xl transition-all duration-300 shadow-lg"
         >
           <Phone className="w-6 h-6" />
-          Agendar mi consultoría
-          <ExternalLink className="w-5 h-5" />
+          Reservar mi consultoría
         </a>
       </div>
     </motion.div>
@@ -117,9 +112,10 @@ export function ResultsPersuasiveCTA() {
 export function ResultsBookingSection({ lead }: { lead: Lead }) {
   return (
     <motion.div
+      id="booking-section"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="max-w-2xl mx-auto"
+      className="max-w-2xl mx-auto scroll-mt-20"
     >
       <BookingCalendar
         leadEmail={lead.email}
@@ -140,23 +136,21 @@ export function ResultsBottomCTAs({ lead, answers }: CTAProps) {
         </h2>
         
         <div className="grid md:grid-cols-3 gap-6">
-          {/* Calendly */}
+          {/* Native Booking Link */}
           <a
-            href="https://calendly.com/acrux-consultores/30min"
-            target="_blank"
-            rel="noopener noreferrer"
+            href="#booking-section"
             onClick={() => {
-              trackCTAClick('calendly');
+              trackCTAClick('booking_section');
             }}
             className="group bg-primary-50 rounded-xl p-6 hover:bg-primary-100 transition-colors cursor-pointer text-left block"
           >
             <div className="w-12 h-12 bg-primary-600 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
               <Calendar className="w-6 h-6 text-white" />
             </div>
-            <h3 className="font-semibold text-slate-900 mb-2">Agendar consultoría</h3>
+            <h3 className="font-semibold text-slate-900 mb-2">Reservar consultoría</h3>
             <p className="text-sm text-slate-600 mb-4">30 minutos gratuitos para interpretar tus resultados con un consultor.</p>
             <span className="inline-flex items-center text-primary-600 text-sm font-semibold">
-              Agendar ahora
+              Reservar ahora
               <ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
             </span>
           </a>

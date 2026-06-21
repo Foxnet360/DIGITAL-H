@@ -48,11 +48,11 @@ export default function BookingCalendar({ leadEmail, leadName, company }: Bookin
     }));
   };
 
-  const handleDateSelect = (date: Date) => {
+  const handleDateSelect = async (date: Date) => {
     setSelectedDate(date);
     setSelectedTime(null);
     setError(null);
-    // Check if date is at least 24h in advance
+    
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
     tomorrow.setHours(0, 0, 0, 0);
@@ -63,7 +63,30 @@ export default function BookingCalendar({ leadEmail, leadName, company }: Bookin
       return;
     }
     
-    setAvailableSlots(generateTimeSlots(date));
+    setIsSubmitting(true); // show loading indicator or prevent clicks while loading
+    try {
+      const dateStr = date.toISOString().split('T')[0];
+      const response = await fetch(`./api/booking.php?date=${dateStr}`);
+      const result = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(result.error || 'Error al obtener disponibilidad');
+      }
+      
+      const bookedSlots = result.booked_slots || [];
+      const slots = ['09:00', '10:00', '11:00', '14:00', '15:00', '16:00'];
+      const updatedSlots = slots.map(time => ({
+        time,
+        available: !bookedSlots.includes(time)
+      }));
+      setAvailableSlots(updatedSlots);
+    } catch (err) {
+      setError('Error al conectar con el servidor de reservas');
+      const slots = ['09:00', '10:00', '11:00', '14:00', '15:00', '16:00'];
+      setAvailableSlots(slots.map(time => ({ time, available: true })));
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleBooking = async () => {
@@ -138,7 +161,7 @@ export default function BookingCalendar({ leadEmail, leadName, company }: Bookin
         </div>
         <div>
           <h3 className="text-xl font-bold text-slate-800">Reservar mi sesión de 30 min</h3>
-          <p className="text-sm text-slate-500">Con Psicólogo Organizacional</p>
+          <p className="text-sm text-slate-500">Con profesionales</p>
         </div>
       </div>
 

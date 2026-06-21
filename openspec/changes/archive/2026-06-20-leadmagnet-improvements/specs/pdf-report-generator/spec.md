@@ -1,9 +1,6 @@
-# pdf-report-generator Specification
+# Delta for pdf-report-generator
 
-## Purpose
-Define the requirements for generating professional, multi-page PDF reports from diagnostic results.
-
-## Requirements
+## MODIFIED Requirements
 
 ### Requirement: Generate multi-page structured PDF report
 
@@ -27,11 +24,3 @@ The generated PDF SHALL include a header with the transparent Acrux logo, the us
 - **THEN** each page SHALL display a header with the transparent Acrux logo, "DIGITAL-H | Diagnóstico de Madurez Digital", and the company name
 - **AND** the footer SHALL include the dynamic page number (e.g., "Página X de Y") and "Copyright 2026 Acrux | acrux.life"
 - **AND** no content overlaps SHALL occur between headers, body content, and footers
-
-### Requirement: PDF content reflects actual user data
-All data displayed in the PDF SHALL correspond exactly to the user's answers, calculated IMD, maturity level, and dimension averages.
-
-#### Scenario: Accurate data in PDF
-- **WHEN** the PDF is generated for a user with IMD 58%
-- **THEN** the cover page SHALL show "58%" and "Desarrollo"
-- **AND** the dimension analysis table SHALL show the exact average for each of the 6 dimensions based on the user's answers

@@ -88,6 +88,11 @@ export default function App() {
     return () => window.removeEventListener('beforeunload', handleBeforeUnload);
   }, [screen, currentIdx]);
 
+  // Scroll to top on screen change
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [screen]);
+
   const handleLeadSubmit = (data: any) => {
     setLead(data);
     finishDiagnostic(answers, data, setLead, transitionToScreen);

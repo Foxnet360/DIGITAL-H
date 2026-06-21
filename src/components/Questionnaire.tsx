@@ -61,6 +61,11 @@ export default function Questionnaire({
     return () => clearInterval(interval);
   }, [startTime]);
 
+  // Scroll to top on question transition
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [currentIdx]);
+
   const formatTime = (seconds: number): string => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;

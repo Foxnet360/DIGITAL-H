@@ -25,9 +25,9 @@ export default function Results({ answers, lead }: ResultsProps) {
   const level = getMaturityLevel(imd);
 
   const roadmap = [
-    { phase: "Fase 1: Cimientos", time: "Mes 1-2", task: "Alineación estratégica y setup de infraestructura básica.", status: "Prioritario" },
-    { phase: "Fase 2: Adopción", time: "Mes 3-5", task: "Capacitación de equipos y automatización de procesos clave.", status: "Enfoque" },
-    { phase: "Fase 3: Escalamiento", time: "Mes 6+", task: "Analítica avanzada y optimización continua basada en datos.", status: "Visión" }
+    { phase: "Fase 1: Cimientos", time: "Mes 1-2", task: "Establecer la alineación de liderazgo, evaluar las capacidades tecnológicas actuales, capacitar en fundamentos digitales y configurar las herramientas esenciales para asegurar una base operativa sólida.", status: "Prioritario" },
+    { phase: "Fase 2: Adopción", time: "Mes 3-5", task: "Implementar la automatización de flujos de trabajo clave, fomentar la adopción activa de nuevas herramientas mediante talleres prácticos y rediseñar los procesos para mejorar la eficiencia del equipo.", status: "Enfoque" },
+    { phase: "Fase 3: Escalamiento", time: "Mes 6+", task: "Integrar sistemas de analítica avanzada para la toma de decisiones basada en datos, escalar la automatización a nivel de toda la organización y establecer un ciclo de innovación y optimización continua.", status: "Visión" }
   ];
 
   const getResources = () => {
@@ -35,7 +35,7 @@ export default function Results({ answers, lead }: ResultsProps) {
       { 
         title: "Guía: 10 Pasos para Iniciar tu Transformación", 
         type: "PDF", 
-        link: "https://acrux.life/docs/10-Pasos-Para-la-Transformacion.pdf",
+        link: "/docs/10-Pasos-Para-la-Transformacion.pdf",
         description: "22 páginas de acciones prácticas"
       }
     ];
@@ -49,7 +49,7 @@ export default function Results({ answers, lead }: ResultsProps) {
       { 
         title: "Ebook: La PYME Digital del Siglo XXI", 
         type: "Ebook", 
-        link: "https://acrux.life/docs/eBook-La-PYME-Digital-del-Siglo-XXI.pdf",
+        link: "/docs/eBook-La-PYME-Digital-del-Siglo-XXI.pdf",
         description: "29 páginas de estrategias digitales"
       }
     ];
