@@ -1,19 +1,39 @@
 <?php
 // Configuración de la base de datos MySQL - Hostinger
-$DB_HOST = 'localhost';
-$DB_USER = 'u554044004_acruxuser';
-$DB_PASS = '4Crux2026*';
-$DB_NAME = 'u554044004_acruxdb';
+// Las credenciales sensibles se cargan desde variables de entorno.
+// Configúralas vía .htaccess SetEnv o un archivo config.local.php (no versionado).
+
+// Helper para leer variables de entorno
+function env($key, $default = '') {
+    if (isset($_SERVER[$key]) && $_SERVER[$key] !== '') {
+        return $_SERVER[$key];
+    }
+    $val = getenv($key);
+    return ($val !== false && $val !== '') ? $val : $default;
+}
+
+$DB_HOST = env('DB_HOST', 'localhost');
+$DB_USER = env('DB_USER', 'u554044004_acruxuser');
+$DB_PASS = env('DB_PASS', '');
+$DB_NAME = env('DB_NAME', 'u554044004_acruxdb');
 
 // Configuración SMTP - Hostinger
-$SMTP_HOST = 'smtp.hostinger.com';
-$SMTP_PORT = 465;
-$SMTP_SECURE = true; // SSL
-$SMTP_USER = 'hola@acrux.life';
-$SMTP_PASS = '4Crux2026*';
-$SMTP_FROM = 'DIGITAL-H <hola@acrux.life>';
+$SMTP_HOST = env('SMTP_HOST', 'smtp.hostinger.com');
+$SMTP_PORT = intval(env('SMTP_PORT', 465));
+$SMTP_SECURE = filter_var(env('SMTP_SECURE', 'true'), FILTER_VALIDATE_BOOLEAN);
+$SMTP_USER = env('SMTP_USER', 'hola@acrux.life');
+$SMTP_PASS = env('SMTP_PASS', '');
+$SMTP_FROM = env('SMTP_FROM', 'DIGITAL-H <hola@acrux.life>');
 
-// Función para conectar a la BD
+// Advertencias si faltan credenciales sensibles (sin bloquear la aplicación)
+if ($DB_PASS === '') {
+    error_log('DIGITAL-H Warning: DB_PASS no está configurado en variables de entorno.');
+}
+if ($SMTP_PASS === '') {
+    error_log('DIGITAL-H Warning: SMTP_PASS no está configurado en variables de entorno.');
+}
+
+// Función para conectar a la BD (mysqli - legacy)
 function getDBConnection() {
     global $DB_HOST, $DB_USER, $DB_PASS, $DB_NAME;
     
@@ -25,6 +45,21 @@ function getDBConnection() {
     
     $conn->set_charset("utf8mb4");
     return $conn;
+}
+
+// Función para conectar a la BD vía PDO (unified nurturing)
+function getPDOConnection() {
+    global $DB_HOST, $DB_USER, $DB_PASS, $DB_NAME;
+    
+    try {
+        $pdo = new PDO("mysql:host=$DB_HOST;dbname=$DB_NAME;charset=utf8mb4", $DB_USER, $DB_PASS);
+        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+        return $pdo;
+    } catch (PDOException $e) {
+        error_log('DIGITAL-H PDO Connection failed: ' . $e->getMessage());
+        return null;
+    }
 }
 
 // Función para enviar respuesta JSON

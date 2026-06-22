@@ -50,6 +50,8 @@ CREATE TABLE IF NOT EXISTS digitalh_results (
 
 ### Paso 2: Configurar Variables de Entorno
 
+El backend de DIGITAL-H y el adaptador de **unified nurturing** usan las mismas variables de entorno de base de datos y SMTP.
+
 Opción A - Usar el archivo `.env` existente (ya está configurado)
 
 Opción B - Configurar en el panel de Hostinger:
@@ -57,7 +59,7 @@ Opción B - Configurar en el panel de Hostinger:
 2. Configura estas variables:
    - `DB_HOST=localhost`
    - `DB_USER=u554044004_acruxuser`
-   - `DB_PASSWORD=<YOUR_PASSWORD>`
+   - `DB_PASS=<YOUR_PASSWORD>`
    - `DB_NAME=u554044004_acruxdb`
    - `SMTP_HOST=smtp.hostinger.com`
    - `SMTP_PORT=465`
@@ -65,6 +67,22 @@ Opción B - Configurar en el panel de Hostinger:
    - `SMTP_USER=hola@acrux.life`
    - `SMTP_PASS=<YOUR_PASSWORD>`
    - `SMTP_FROM=DIGITAL-H <hola@acrux.life>`
+
+Opción C - Configurar vía `.htaccess` (alternativa al panel):
+```apache
+SetEnv DB_HOST localhost
+SetEnv DB_USER u554044004_acruxuser
+SetEnv DB_PASS <YOUR_PASSWORD>
+SetEnv DB_NAME u554044004_acruxdb
+SetEnv SMTP_HOST smtp.hostinger.com
+SetEnv SMTP_PORT 465
+SetEnv SMTP_SECURE true
+SetEnv SMTP_USER hola@acrux.life
+SetEnv SMTP_PASS <YOUR_PASSWORD>
+SetEnv SMTP_FROM "DIGITAL-H <hola@acrux.life>"
+```
+
+> **Nota sobre unified nurturing:** no se requieren variables adicionales. El adaptador reutiliza `DB_*` para conectarse por PDO a `nurturing_sequences` y `SMTP_*` para enviar el Email 1 inmediato.
 
 ### Paso 3: Subir Archivos
 
