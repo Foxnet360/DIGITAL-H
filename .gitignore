@@ -10,3 +10,7 @@ coverage/
 # Backup of old config with credentials
 public/digital-h/api/config.php.bak
 public/digital-h/api/config_backup.php
+
+# Local environment/sensitive config
+config.local.php
+public/api/config.local.php

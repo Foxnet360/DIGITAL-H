@@ -58,12 +58,12 @@
 ## 8. QA, Testing y Despliegue
 
 - [x] 8.1 Ejecutar `npm run lint` y corregir errores de TypeScript
-- [ ] 8.2 Probar flujo completo end-to-end: Landing → Quiz → LeadForm → Results → PDF → Email
-- [ ] 8.3 Verificar que `localStorage` persiste y restaura correctamente tras F5
-- [ ] 8.4 Verificar que el email se envía y contiene datos correctos (usar sandbox de Resend)
-- [ ] 8.5 Verificar que el PDF descargado tiene múltiples páginas y datos correctos
+- [x] 8.2 Probar flujo completo end-to-end: Landing → Quiz → LeadForm → Results → PDF → Email
+- [x] 8.3 Verificar que `localStorage` persiste y restaura correctamente tras F5
+- [x] 8.4 Verificar que el email se envía y contiene datos correctos (usar sandbox de Resend)
+- [x] 8.5 Verificar que el PDF descargado tiene múltiples páginas y datos correctos
 - [x] 8.6 Ejecutar `npm run build` y confirmar que no hay errores de compilación
-- [ ] 8.7 Revisar visualmente en mobile (viewport 375px) que el branding y layout no se rompen
+- [x] 8.7 Revisar visualmente en mobile (viewport 375px) que el branding y layout no se rompen
 
 ## 9. Base de Datos MySQL (acrux.life)
 

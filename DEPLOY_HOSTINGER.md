@@ -57,13 +57,13 @@ Opción B - Configurar en el panel de Hostinger:
 2. Configura estas variables:
    - `DB_HOST=localhost`
    - `DB_USER=u554044004_acruxuser`
-   - `DB_PASSWORD=4Crux2026*`
+   - `DB_PASSWORD=<YOUR_PASSWORD>`
    - `DB_NAME=u554044004_acruxdb`
    - `SMTP_HOST=smtp.hostinger.com`
    - `SMTP_PORT=465`
    - `SMTP_SECURE=true`
    - `SMTP_USER=hola@acrux.life`
-   - `SMTP_PASS=4Crux2026*`
+   - `SMTP_PASS=<YOUR_PASSWORD>`
    - `SMTP_FROM=DIGITAL-H <hola@acrux.life>`
 
 ### Paso 3: Subir Archivos

@@ -1,20 +1,53 @@
 schema: spec-driven
 
-# Project context (optional)
-# This is shown to AI when creating artifacts.
-# Add your tech stack, conventions, style guides, domain knowledge, etc.
-# Example:
-#   context: |
-#     Tech stack: TypeScript, React, Node.js
-#     We use conventional commits
-#     Domain: e-commerce platform
+context: |
+  Project: DIGITAL-H — interactive digital-maturity lead magnet for Acrux Consultores.
+  Frontend: React 19 + TypeScript 5.8 + Vite 8 + Tailwind CSS v4.
+  Backend: PHP REST API + MySQL 8 (Docker Compose local, Hostinger production via deploy.sh).
+  Tests: Vitest 4.1.6 + @testing-library/react + jsdom. Run `npm run test:run` for CI.
+  Quality: `npm run lint` runs `tsc --noEmit && npx -y eslint .`. No formatter configured.
+  Domain: 48-question diagnosis across 6 dimensions; PDF report; Calendly booking; GA4 analytics.
+  Conventions: ES modules, path alias `@` maps to project root, no Prettier, no CI workflow yet.
 
-# Per-artifact rules (optional)
-# Add custom rules for specific artifacts.
-# Example:
-#   rules:
-#     proposal:
-#       - Keep proposals under 500 words
-#       - Always include a "Non-goals" section
-#     tasks:
-#       - Break tasks into chunks of max 2 hours
+strict_tdd: true
+
+testing:
+  strict_tdd: true
+  runner: vitest
+  test_command: npm run test:run
+  watch_command: npm test
+  environment: jsdom
+  layers:
+    unit: true
+    integration: false
+    e2e: false
+  coverage: false
+  coverage_command: null
+  linter: true
+  lint_command: npm run lint
+  type_checker: true
+  type_check_command: npx tsc --noEmit
+  formatter: false
+  format_command: null
+
+rules:
+  proposal:
+    - Keep proposals under 500 words.
+    - Include intent, scope, non-goals, and approach.
+  spec:
+    - Write requirements as user-observable scenarios.
+    - Keep delta specs focused on the current change.
+  design:
+    - Prefer React hooks and presentational components.
+    - Document data flow and GA4 event changes when relevant.
+  tasks:
+    - Break tasks into reviewable chunks of ~2 hours.
+    - Keep tests with the code they verify.
+  apply:
+    - Run `npm run lint` before considering a task done.
+    - Add or update tests for hook and utility changes.
+  verify:
+    - Run `npm run test:run` and `npm run lint`.
+    - Confirm no TypeScript errors.
+  archive:
+    - Sync approved delta specs back to openspec/specs/ before archiving.
