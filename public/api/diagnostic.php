@@ -115,6 +115,7 @@ $level = $data['level'];
 $answers = $data['answers'];
 $gdprConsent = $data['gdprConsent'] ?? false;
 $gdprTimestamp = $data['gdprTimestamp'] ?? null;
+$marketingConsent = $data['marketingConsent'] ?? $data['marketing_consent'] ?? true;
 
 // Generar share token UUID v4
 $shareToken = sprintf('%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
@@ -159,7 +160,7 @@ try {
     $stmt->close();
     $conn->close();
     
-    // Registrar en nurturing unificado y enviar Email 1 si hay consentimiento GDPR
+    // Registrar en nurturing unificado y enviar Email 1 si hay consentimiento GDPR y marketing
     $sequenceId = null;
     $email1Sent = false;
     if ($gdprConsent) {
@@ -172,10 +173,12 @@ try {
                     'company' => $company,
                     'score' => $imd,
                     'level' => $level,
-                    'answers' => $answers
+                    'answers' => $answers,
+                    'gdpr_consent' => $gdprConsent,
+                    'marketing_consent' => $marketingConsent,
                 ]);
                 
-                if ($sequenceId) {
+                if ($sequenceId && $marketingConsent) {
                     $email1Sent = sendEmail1([
                         'email' => $email,
                         'name' => $name,
@@ -275,12 +278,14 @@ function calculateWeakDimension($answers) {
  */
 function insertEmailSequence($pdo, $data) {
     $weakDimension = calculateWeakDimension($data['answers'] ?? []);
+    $gdprConsent = !empty($data['gdpr_consent']) ? 1 : 0;
+    $marketingConsent = isset($data['marketing_consent']) ? ($data['marketing_consent'] ? 1 : 0) : 1;
 
     $stmt = $pdo->prepare("
         INSERT INTO nurturing_sequences 
         (email, name, company, product, score, maturity_level, weak_dimension, 
-         status, current_step, total_steps, gdpr_consent, gdpr_timestamp, next_send_at)
-        VALUES (?, ?, ?, 'digital-h', ?, ?, ?, 'active', 0, 5, 1, NOW(), NOW())
+         status, current_step, total_steps, gdpr_consent, marketing_consent, gdpr_timestamp, next_send_at)
+        VALUES (?, ?, ?, 'digital-h', ?, ?, ?, 'active', 0, 5, ?, ?, NOW(), NOW())
         ON DUPLICATE KEY UPDATE
             name = VALUES(name),
             company = VALUES(company),
@@ -289,7 +294,8 @@ function insertEmailSequence($pdo, $data) {
             weak_dimension = VALUES(weak_dimension),
             current_step = 0,
             status = 'active',
-            gdpr_consent = 1,
+            gdpr_consent = VALUES(gdpr_consent),
+            marketing_consent = VALUES(marketing_consent),
             gdpr_timestamp = NOW(),
             next_send_at = NOW(),
             last_sent_at = NULL,
@@ -307,7 +313,9 @@ function insertEmailSequence($pdo, $data) {
         $data['company'],
         $data['score'],
         $data['level'],
-        $weakDimension
+        $weakDimension,
+        $gdprConsent,
+        $marketingConsent,
     ]);
 
     $select = $pdo->prepare("SELECT id FROM nurturing_sequences WHERE email = ? AND product = 'digital-h'");
