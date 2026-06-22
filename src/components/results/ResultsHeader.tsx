@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { motion } from 'motion/react';
 import { Award, Check, Copy } from 'lucide-react';
 import { getMaturityLevel } from '../../utils';
 import { USER_LEVELS } from '../../levels';
@@ -12,7 +11,7 @@ interface ResultsHeaderProps {
   shareUrl?: string;
 }
 
-export default function ResultsHeader({ name, company, imd, level, shareUrl }: ResultsHeaderProps) {
+export default function ResultsHeader({ name, company, imd, level: _level, shareUrl }: ResultsHeaderProps) {
   const [copied, setCopied] = useState(false);
   const levelInfo = getMaturityLevel(imd);
   const levelName = levelInfo.name;

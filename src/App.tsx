@@ -45,7 +45,7 @@ export default function App() {
     }
   });
 
-  const { points, unlockedBadges, setUnlockedBadges, showBadge, setShowBadge } = useGameState(answers);
+  const { points, unlockedBadges, showBadge, setShowBadge } = useGameState(answers);
   const { showResumePrompt, setShowResumePrompt, loadSession } = useSession(answers, currentIdx, points, unlockedBadges, screen);
   const { finishDiagnostic } = useDiagnostic();
   const { transition } = useViewTransition();

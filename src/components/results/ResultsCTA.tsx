@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'motion/react';
-import { Calendar, Linkedin, Phone, ExternalLink, CheckCircle2, Compass, ArrowRight } from 'lucide-react';
+import { Calendar, Linkedin, Phone, CheckCircle2, Compass, ArrowRight } from 'lucide-react';
 import { Lead } from '../../types';
 import { trackEvent, trackCTAClick } from '../../utils/analytics';
 import BookingCalendar from '../BookingCalendar';

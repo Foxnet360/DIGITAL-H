@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
-import { Mail, User, Building2, ChevronRight, ShieldCheck, FileText, BarChart3, Award, Zap, Clock, AlertTriangle, CheckCircle2, Phone, Briefcase, Factory, Users } from 'lucide-react';
+import { Mail, User, Building2, ChevronRight, ShieldCheck, FileText, BarChart3, Award, Zap, Clock, AlertTriangle, CheckCircle2 } from 'lucide-react';
 import PrivacyModal from './PrivacyModal';
 import { trackEvent } from '../utils/analytics';
 
@@ -415,7 +415,7 @@ export default function LeadForm({
                   onChange={e => {
                     setFormData({ ...formData, gdprConsent: e.target.checked });
                     if (e.target.checked) {
-                      setErrors(prev => { const { gdpr, ...rest } = prev; return rest; });
+                      setErrors(prev => { const { gdpr: _gdpr, ...rest } = prev; return rest; });
                     }
                   }}
                   className={`mt-1 w-5 h-5 rounded border-2 cursor-pointer transition-colors ${

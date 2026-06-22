@@ -7,7 +7,7 @@ interface ScoreCardProps {
   levelColor: string;
 }
 
-export default function ScoreCard({ imd, level, levelColor }: ScoreCardProps) {
+export default function ScoreCard({ imd, level: _level, levelColor: _levelColor }: ScoreCardProps) {
   const radius = 110;
   const strokeWidth = 16;
   const circumference = 2 * Math.PI * radius;

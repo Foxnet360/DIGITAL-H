@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
-import { 
-  Rocket, ChevronRight, CheckCircle2, BarChart3, Users, Shield, Heart, Star, 
-  ArrowRight, Clock, Award, TrendingUp, FileText, Lock, ChevronDown, Zap,
+import {
+  Rocket, CheckCircle2, BarChart3, Users, Shield, Heart, Star,
+  ArrowRight, Clock, Award, TrendingUp, FileText, ChevronDown, Zap,
   MessageCircle, TrendingUp as TrendingIcon, Sparkles
 } from 'lucide-react';
-import { getUtmMessages, getUtmSource } from '../utm-messages';
+import { getUtmMessages } from '../utm-messages';
 
 interface LandingProps {
   onStart: () => void;
@@ -15,7 +15,6 @@ export default function Landing({ onStart }: LandingProps) {
   const [isMobile, setIsMobile] = useState(false);
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const utmMessages = getUtmMessages();
-  const utmSource = getUtmSource();
 
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 768);

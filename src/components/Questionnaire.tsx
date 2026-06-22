@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { ChevronLeft, ChevronRight, Rocket, Heart, Users, Cpu, BarChart3, Star, Save, Clock } from 'lucide-react';
-import { Question, Dimension } from '../types';
+import { Question } from '../types';
 import { DIMENSIONS } from '../constants';
 
 interface QuestionnaireProps {

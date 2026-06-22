@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { motion } from 'motion/react';
 import { Calendar, Clock, CheckCircle2, AlertTriangle, Phone } from 'lucide-react';
 import { trackEvent } from '../utils/analytics';
@@ -26,7 +26,7 @@ export default function BookingCalendar({ leadEmail, leadName, company }: Bookin
   const getAvailableDates = (): Date[] => {
     const dates: Date[] = [];
     const today = new Date();
-    let currentDate = new Date(today);
+    const currentDate = new Date(today);
     currentDate.setDate(currentDate.getDate() + 1); // Start from tomorrow
 
     while (dates.length < 14) {
@@ -37,15 +37,6 @@ export default function BookingCalendar({ leadEmail, leadName, company }: Bookin
       currentDate.setDate(currentDate.getDate() + 1);
     }
     return dates;
-  };
-
-  // Generate time slots for a date
-  const generateTimeSlots = (date: Date): TimeSlot[] => {
-    const slots = ['09:00', '10:00', '11:00', '14:00', '15:00', '16:00'];
-    return slots.map(time => ({
-      time,
-      available: true // In real implementation, check against database
-    }));
   };
 
   const handleDateSelect = async (date: Date) => {
@@ -80,7 +71,7 @@ export default function BookingCalendar({ leadEmail, leadName, company }: Bookin
         available: !bookedSlots.includes(time)
       }));
       setAvailableSlots(updatedSlots);
-    } catch (err) {
+    } catch (_err) {
       setError('Error al conectar con el servidor de reservas');
       const slots = ['09:00', '10:00', '11:00', '14:00', '15:00', '16:00'];
       setAvailableSlots(slots.map(time => ({ time, available: true })));
@@ -121,8 +112,8 @@ export default function BookingCalendar({ leadEmail, leadName, company }: Bookin
         flow_version: 'v2_q48_capture',
         booking_date: selectedDate.toISOString().split('T')[0]
       });
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error desconocido');
+    } catch (_err) {
+      setError(_err instanceof Error ? _err.message : 'Error desconocido');
     } finally {
       setIsSubmitting(false);
     }

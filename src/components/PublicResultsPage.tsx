@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
-import { Loader2, AlertCircle, Calendar } from 'lucide-react';
+import { Loader2, AlertCircle } from 'lucide-react';
 import { Lead } from '../types';
 import ResultsHeader from './results/ResultsHeader';
 import ScoreCard from './results/ScoreCard';

@@ -8,7 +8,7 @@ export function useViewTransition() {
   const supportsViewTransitions = typeof document !== 'undefined' && 
     'startViewTransition' in document;
 
-  const transition = (callback: () => void, options?: { name?: string }) => {
+  const transition = (callback: () => void, _options?: { name?: string }) => {
     if (!supportsViewTransitions) {
       callback();
       return;

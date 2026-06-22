@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { QUESTIONS } from '../constants';
 
 export function useQuestionnaire(onComplete: () => void) {
