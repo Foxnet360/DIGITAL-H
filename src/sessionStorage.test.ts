@@ -6,7 +6,7 @@ describe('sessionStorage', () => {
     localStorage.clear();
   });
 
-  const mockSession: Omit<SessionState, 'timestamp'> = {
+  const mockSession: Omit<SessionState, 'timestamp' | 'version'> = {
     answers: { q1: 10, q2: 5 },
     currentIdx: 2,
     points: 15,
@@ -21,6 +21,7 @@ describe('sessionStorage', () => {
     expect(parsed.currentIdx).toBe(2);
     expect(parsed.points).toBe(15);
     expect(parsed.timestamp).toBeDefined();
+    expect(parsed.version).toBe(1);
   });
 
   it('loads session correctly', () => {
@@ -37,12 +38,27 @@ describe('sessionStorage', () => {
     expect(loadSession()).toBeNull();
   });
 
-  it('returns null if session is corrupted', () => {
+  it('returns null and clears storage if session is corrupted', () => {
     localStorage.setItem('digitalh_session', 'invalid_json');
     expect(loadSession()).toBeNull();
+    expect(localStorage.getItem('digitalh_session')).toBeNull();
 
     localStorage.setItem('digitalh_session', JSON.stringify({ currentIdx: "not_a_number" }));
     expect(loadSession()).toBeNull();
+    expect(localStorage.getItem('digitalh_session')).toBeNull();
+  });
+
+  it('returns null and clears storage if session version is missing or stale', () => {
+    const staleSession: Omit<SessionState, 'version'> = {
+      answers: { q1: 10, q2: 5 },
+      currentIdx: 2,
+      points: 15,
+      unlockedBadges: ['badge1'],
+      timestamp: Date.now(),
+    };
+    localStorage.setItem('digitalh_session', JSON.stringify(staleSession));
+    expect(loadSession()).toBeNull();
+    expect(localStorage.getItem('digitalh_session')).toBeNull();
   });
 
   it('clears session correctly', () => {

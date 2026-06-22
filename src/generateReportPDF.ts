@@ -124,9 +124,19 @@ export async function generateReportPDF(data: PDFData) {
   doc.setFont('helvetica', 'bold');
   doc.text('Análisis por Dimensión', margin, 40);
 
+  const dimensionPrefixMap: Record<string, string> = {
+    estrategia: 'E',
+    cultura: 'C',
+    talento: 'T',
+    tecnologia: 'I',
+    procesos: 'P',
+    bienestar: 'B',
+  };
+
   const dimensionData = DIMENSIONS.map(dim => {
+    const prefix = dimensionPrefixMap[dim.id];
     const dimAnswers = Object.entries(answers)
-      .filter(([id]) => id.startsWith(dim.id.charAt(0).toUpperCase()))
+      .filter(([id]) => prefix ? id.startsWith(prefix) : false)
       .map(([_, val]) => val);
     const avg = dimAnswers.reduce((a, b) => a + b, 0) / (dimAnswers.length || 1);
     const percentage = Math.round((avg / 5) * 100);
@@ -334,7 +344,7 @@ export async function generateReportPDF(data: PDFData) {
   doc.link(pageWidth / 2 - 30, 170, 60, 8, { url: 'https://acrux.life' });
 
   // Add footers on all pages
-  const totalPages = doc.internal.getNumberOfPages();
+  const totalPages = (doc.internal as any).getNumberOfPages();
   for (let i = 1; i <= totalPages; i++) {
     doc.setPage(i);
     doc.setFillColor(240, 244, 248);

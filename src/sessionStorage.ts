@@ -1,4 +1,5 @@
 const SESSION_KEY = 'digitalh_session';
+const SESSION_VERSION = 1;
 
 export interface SessionState {
   answers: Record<string, number>;
@@ -6,12 +7,14 @@ export interface SessionState {
   points: number;
   unlockedBadges: string[];
   timestamp: number;
+  version: number;
 }
 
-export function saveSession(state: Omit<SessionState, 'timestamp'>) {
+export function saveSession(state: Omit<SessionState, 'timestamp' | 'version'>) {
   const data: SessionState = {
     ...state,
     timestamp: Date.now(),
+    version: SESSION_VERSION,
   };
   try {
     localStorage.setItem(SESSION_KEY, JSON.stringify(data));
@@ -25,8 +28,9 @@ export function loadSession(): SessionState | null {
     const raw = localStorage.getItem(SESSION_KEY);
     if (!raw) return null;
     const data = JSON.parse(raw) as SessionState;
-    // Validate structure
+    // Validate structure and version
     if (
+      data.version === SESSION_VERSION &&
       typeof data.answers === 'object' &&
       typeof data.currentIdx === 'number' &&
       typeof data.points === 'number' &&
@@ -37,6 +41,7 @@ export function loadSession(): SessionState | null {
   } catch {
     // Invalid or corrupted data
   }
+  clearSession();
   return null;
 }
 

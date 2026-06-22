@@ -195,10 +195,10 @@ export default function Results({ answers, lead }: ResultsProps) {
           className="bg-white rounded-[2.5rem] p-8 md:p-12 shadow-xl border border-slate-100"
         >
           <div className="flex items-center justify-between mb-12">
-            <div>
-              <h2 className="text-3xl font-bold text-slate-800 flex items-center">
-                <Map className="w-8 h-8 mr-3 text-primary-600" />
-                Hoja de Ruta de Transformación
+            <div className="min-w-0">
+              <h2 className="text-2xl sm:text-3xl font-bold text-slate-800 flex flex-wrap items-center gap-2">
+                <Map className="w-7 h-7 sm:w-8 sm:h-8 text-primary-600 flex-shrink-0" />
+                <span>Hoja de Ruta de Transformación</span>
               </h2>
               <p className="text-slate-500 mt-2">Tu camino personalizado hacia la excelencia digital.</p>
             </div>

@@ -84,6 +84,39 @@ describe('useDiagnostic', () => {
     expect(clearSession).toHaveBeenCalled();
   });
 
+  it('sends all fields required for the email report', async () => {
+    const mockResponse = {
+      success: true,
+      id: 1,
+      share_token: 'uuid-token',
+      email_sent: true,
+    };
+    (global.fetch as any).mockResolvedValue({
+      ok: true,
+      json: async () => mockResponse,
+    });
+
+    const setLead = vi.fn();
+    const setScreen = vi.fn();
+    const gdprTimestamp = Date.now();
+    const leadWithConsent = { ...mockLead, gdprConsent: true, gdprTimestamp };
+
+    const { result } = renderHook(() => useDiagnostic());
+    await result.current.finishDiagnostic(mockAnswers, leadWithConsent, setLead, setScreen);
+
+    const callBody = JSON.parse((global.fetch as any).mock.calls[0][1].body);
+    expect(callBody).toMatchObject({
+      name: leadWithConsent.name,
+      company: leadWithConsent.company,
+      imd: 80,
+      level: 'Excelente',
+      answers: mockAnswers,
+      gdprConsent: true,
+      gdprTimestamp,
+    });
+    expect(callBody.email).toMatch(/^[^\s@]+@[^\s@]+\.[^\s@]+$/);
+  });
+
   it('fetch network error fallback path', async () => {
     (global.fetch as any).mockRejectedValue(new Error('Network error'));
 
