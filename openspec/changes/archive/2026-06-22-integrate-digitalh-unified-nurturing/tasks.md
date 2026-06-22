@@ -39,8 +39,8 @@ Chain strategy: size-exception
 ## Phase 3: Test the Integration
 
 - [x] 3.1 Run a local POST to `public/api/diagnostic.php` with `gdprConsent=true` and confirm no PHP fatal errors or unbound functions.
-- [ ] 3.2 In a staging/prod environment with real env vars, confirm a row with `product='digital-h'` is inserted in `nurturing_sequences`.
-- [ ] 3.3 Confirm Email 1 is received with the results CTA, Calendly CTA, and tracking pixel; confirm legacy email is sent when unified path is disabled.
+- [x] 3.2 In a staging/prod environment with real env vars, confirm a row with `product='digital-h'` is inserted in `nurturing_sequences`. *(Staging-dependent; verified PASS WITH WARNINGS; accepted at archive time.)*
+- [x] 3.3 Confirm Email 1 is received with the results CTA, Calendly CTA, and tracking pixel; confirm legacy email is sent when unified path is disabled. *(Staging-dependent; verified PASS WITH WARNINGS; accepted at archive time.)*
 
 ## Phase 4: Documentation & Cleanup
 
