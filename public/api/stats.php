@@ -9,7 +9,15 @@
 require_once 'config.php';
 
 header('Content-Type: application/json');
-header('Access-Control-Allow-Origin: *');
+
+// Validar CORS contra allow-list
+$origin = $_SERVER['HTTP_ORIGIN'] ?? '';
+if (!isAllowedOrigin($origin)) {
+    sendJSON(['error' => 'Origin not allowed'], 403);
+}
+if ($origin) {
+    header("Access-Control-Allow-Origin: $origin");
+}
 
 // Only accept GET
 if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
@@ -63,7 +71,7 @@ try {
     
     $conn->close();
     
-} catch (Exception $e) {
+} catch (Throwable $e) {
     error_log("Error in stats.php: " . $e->getMessage());
     http_response_code(500);
     echo json_encode([

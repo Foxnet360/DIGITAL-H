@@ -8,9 +8,40 @@ function env($key, $default = '') {
     if (isset($_SERVER[$key]) && $_SERVER[$key] !== '') {
         return $_SERVER[$key];
     }
+    if (isset($_ENV[$key]) && $_ENV[$key] !== '') {
+        return $_ENV[$key];
+    }
     $val = getenv($key);
     return ($val !== false && $val !== '') ? $val : $default;
 }
+
+function loadEnv($dir) {
+    $path = rtrim($dir, '/') . '/.env';
+    if (!file_exists($path)) {
+        return;
+    }
+    $lines = file($path, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+    foreach ($lines as $line) {
+        $line = trim($line);
+        if (empty($line) || strpos($line, '#') === 0) {
+            continue;
+        }
+        $parts = explode('=', $line, 2);
+        if (count($parts) === 2) {
+            $key = trim($parts[0]);
+            $val = trim($parts[1]);
+            $val = trim($val, "\"'");
+            if (!array_key_exists($key, $_SERVER) && !array_key_exists($key, $_ENV)) {
+                putenv("{$key}={$val}");
+                $_ENV[$key] = $val;
+                $_SERVER[$key] = $val;
+            }
+        }
+    }
+}
+
+// Cargar variables desde la raíz de DIGITAL-H (dos niveles arriba de public/api)
+loadEnv(__DIR__ . '/../..');
 
 $DB_HOST = env('DB_HOST', 'localhost');
 $DB_USER = env('DB_USER', 'u554044004_acruxuser');
@@ -68,6 +99,25 @@ function sendJSON($data, $statusCode = 200) {
     header('Content-Type: application/json; charset=utf-8');
     echo json_encode($data);
     exit;
+}
+
+// Validar origen CORS contra allow-list
+function isAllowedOrigin($origin) {
+    if (!$origin) {
+        return true; // same-origin / server-side
+    }
+    $allowed = [
+        'https://acrux.life',
+        'https://www.acrux.life',
+        'http://localhost:3000',
+        'http://localhost:5173'
+    ];
+    foreach ($allowed as $allowedOrigin) {
+        if ($origin === $allowedOrigin) {
+            return true;
+        }
+    }
+    return false;
 }
 
 // Función para enviar email vía SMTP autenticado

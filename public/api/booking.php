@@ -1,9 +1,12 @@
 <?php
 require_once 'config.php';
 
-// Permitir CORS desde acrux.life
+// Validar CORS contra allow-list
 $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
-if (strpos($origin, 'acrux.life') !== false || $origin === '') {
+if (!isAllowedOrigin($origin)) {
+    sendJSON(['error' => 'Origin not allowed'], 403);
+}
+if ($origin) {
     header("Access-Control-Allow-Origin: $origin");
     header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
     header("Access-Control-Allow-Headers: Content-Type");
@@ -168,12 +171,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'booking_time' => $bookingTimeStr
             ]);
             
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
             $conn->rollback();
             throw $e;
         }
         
-    } catch (Exception $e) {
+    } catch (Throwable $e) {
         error_log("Error en booking.php POST: " . $e->getMessage());
         sendJSON(['error' => 'Error al crear la reserva'], 500);
     }

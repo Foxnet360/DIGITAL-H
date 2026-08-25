@@ -1,9 +1,13 @@
 <?php
 require_once 'config.php';
 
-// Permitir CORS desde acrux.life
+// Validar CORS contra allow-list
 $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
-if (strpos($origin, 'acrux.life') !== false || $origin === '') {
+if (!isAllowedOrigin($origin)) {
+    sendJSON(['error' => 'Origin not allowed'], 403);
+}
+
+if ($origin) {
     header("Access-Control-Allow-Origin: $origin");
     header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
     header("Access-Control-Allow-Headers: Content-Type");
@@ -73,9 +77,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             'share_token' => $row['share_token']
         ]);
         
-    } catch (Exception $e) {
+    } catch (Throwable $e) {
         error_log("Error en diagnostic.php GET: " . $e->getMessage());
-        sendJSON(['error' => 'Error al consultar el diagnostico', 'debug' => $e->getMessage()], 500);
+        sendJSON(['error' => 'Error al consultar el diagnostico'], 500);
     }
     exit;
 }
@@ -117,13 +121,13 @@ $gdprConsent = $data['gdprConsent'] ?? false;
 $gdprTimestamp = $data['gdprTimestamp'] ?? null;
 $marketingConsent = $data['marketingConsent'] ?? $data['marketing_consent'] ?? true;
 
-// Generar share token UUID v4
+// Generar share token UUID v4 con CSPRNG
 $shareToken = sprintf('%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
-    mt_rand(0, 0xffff), mt_rand(0, 0xffff),
-    mt_rand(0, 0xffff),
-    mt_rand(0, 0x0fff) | 0x4000,
-    mt_rand(0, 0x3fff) | 0x8000,
-    mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff)
+    random_int(0, 0xffff), random_int(0, 0xffff),
+    random_int(0, 0xffff),
+    random_int(0, 0x0fff) | 0x4000,
+    random_int(0, 0x3fff) | 0x8000,
+    random_int(0, 0xffff), random_int(0, 0xffff), random_int(0, 0xffff)
 );
 
 try {
@@ -220,9 +224,9 @@ try {
         'email1_sent' => $email1Sent
     ]);
     
-} catch (Exception $e) {
+} catch (Throwable $e) {
     error_log("Error en diagnostic.php: " . $e->getMessage());
-    sendJSON(['error' => 'Error al guardar el diagnostico', 'debug' => $e->getMessage()], 500);
+    sendJSON(['error' => 'Error al guardar el diagnostico'], 500);
 }
 
 /**
