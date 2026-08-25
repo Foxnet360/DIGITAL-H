@@ -61,6 +61,12 @@ export function useDiagnostic() {
       });
 
       clearSession(); // clear session on completion
+      try {
+        localStorage.setItem('digital-h-completed', 'true');
+        localStorage.setItem('lm-digital-h-completed', 'true');
+      } catch (e) {
+        console.warn('Storage not available', e);
+      }
       setScreen('results');
     } catch (error) {
       console.error('Error saving diagnostic:', error);
