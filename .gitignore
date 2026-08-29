@@ -15,3 +15,6 @@ public/digital-h/api/config_backup.php
 # Local environment/sensitive config
 config.local.php
 public/api/config.local.php
+.atl/
+.codegraph/
+

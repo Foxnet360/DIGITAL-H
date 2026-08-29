@@ -30,8 +30,8 @@ export default function FunnelFooter() {
           <div>
             <h4 className="font-semibold text-white mb-4 text-sm uppercase tracking-wider">DIGITAL-H</h4>
             <ul className="space-y-2 text-sm text-white/80">
-              <li><a href="/" className="hover:text-white transition-colors">Inicio</a></li>
-              <li><a href="/" className="hover:text-white transition-colors">Hacer diagnóstico</a></li>
+              <li><a href="/digital-h/" className="hover:text-white transition-colors">Inicio</a></li>
+              <li><a href="/digital-h/" className="hover:text-white transition-colors">Hacer diagnóstico</a></li>
               <li><a href="https://acrux.life/soluciones" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">Nuestros servicios</a></li>
             </ul>
           </div>
