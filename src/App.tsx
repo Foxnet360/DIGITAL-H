@@ -107,7 +107,7 @@ export default function App() {
     });
   };
 
-  // Check URL hash for shared results on mount
+  // Check URL hash for shared results or demo preview on mount
   useEffect(() => {
     const handleHashRoute = () => {
       const hash = window.location.hash;
@@ -116,6 +116,33 @@ export default function App() {
         setPublicResultsId(match[1]);
         setPublicResultsToken(match[2]);
         setScreen('public-results');
+        return;
+      }
+
+      if (hash === '#demo' || hash === '#demo-results' || hash === '#demo-report') {
+        const mockLead: Lead = {
+          name: 'Carlos Mendoza',
+          email: 'carlos.mendoza@empresa.com',
+          company: 'Grupo Innovación S.A.S.',
+          phone: '+57 300 123 4567',
+          size: '50-200',
+          role: 'CEO / Director General',
+          industry: 'Tecnología & Servicios',
+          gdprConsent: true,
+          gdprTimestamp: Date.now(),
+          score: 78
+        };
+        const mockAnswers: Record<string, number> = {
+          'E1.1': 4, 'E1.2': 5, 'E1.3': 4, 'E1.4': 3, 'E1.5': 4, 'E1.6': 3, 'E1.7': 4, 'E1.8': 5,
+          'C2.1': 4, 'C2.2': 4, 'C2.3': 3, 'C2.4': 5, 'C2.5': 4, 'C2.6': 4, 'C2.7': 3, 'C2.8': 4,
+          'T3.1': 3, 'T3.2': 4, 'T3.3': 2, 'T3.4': 3, 'T3.5': 4, 'T3.6': 3, 'T3.7': 4, 'T3.8': 4,
+          'I4.1': 4, 'I4.2': 5, 'I4.3': 3, 'I4.4': 4, 'I4.5': 5, 'I4.6': 4, 'I4.7': 3, 'I4.8': 4,
+          'P5.1': 4, 'P5.2': 4, 'P5.3': 3, 'P5.4': 4, 'P5.5': 4, 'P5.6': 4, 'P5.7': 3, 'P5.8': 4,
+          '6.1': 4, '6.2': 3, '6.3': 4, '6.4': 4, '6.5': 5, '6.6': 4, '6.7': 4, '6.8': 4
+        };
+        setAnswers(mockAnswers);
+        setLead(mockLead);
+        setScreen('results');
       }
     };
 
