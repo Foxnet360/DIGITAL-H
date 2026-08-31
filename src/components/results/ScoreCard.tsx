@@ -1,44 +1,40 @@
 import React from 'react';
 import { motion } from 'motion/react';
-import { Award, Sparkles } from 'lucide-react';
+import { Award } from 'lucide-react';
 
 interface ScoreCardProps {
   imd: number;
   level: string;
-  levelColor: string;
+  levelColor?: string;
 }
 
-export default function ScoreCard({ imd, level, levelColor }: ScoreCardProps) {
-  const radius = 100;
+export default function ScoreCard({ imd, level }: ScoreCardProps) {
+  const radius = 95;
   const strokeWidth = 14;
   const circumference = 2 * Math.PI * radius;
 
   return (
-    <div className="relative w-64 h-64 flex items-center justify-center flex-shrink-0 font-sans">
-      {/* Background Glow */}
-      <div className="absolute inset-0 bg-accent/20 rounded-full blur-3xl pointer-events-none" />
-      
+    <div className="relative w-60 h-60 flex items-center justify-center flex-shrink-0 font-sans">
       <svg className="w-full h-full transform -rotate-90 relative z-10">
         <defs>
-          <linearGradient id="scoreGoldGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#F5A623" />
-            <stop offset="50%" stopColor="#2E86AB" />
-            <stop offset="100%" stopColor="#4A7C59" />
+          <linearGradient id="cleanScoreGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#2E86AB" />
+            <stop offset="100%" stopColor="#F5A623" />
           </linearGradient>
         </defs>
         <circle
-          cx="128"
-          cy="128"
+          cx="120"
+          cy="120"
           r={radius}
-          stroke="rgba(255, 255, 255, 0.15)"
+          stroke="#E2E8F0"
           strokeWidth={strokeWidth}
           fill="transparent"
         />
         <motion.circle
-          cx="128"
-          cy="128"
+          cx="120"
+          cy="120"
           r={radius}
-          stroke="url(#scoreGoldGradient)"
+          stroke="url(#cleanScoreGradient)"
           strokeWidth={strokeWidth}
           fill="transparent"
           strokeDasharray={circumference}
@@ -50,15 +46,12 @@ export default function ScoreCard({ imd, level, levelColor }: ScoreCardProps) {
       </svg>
       
       <div className="absolute inset-0 flex flex-col items-center justify-center text-center z-20">
-        <div className="flex items-center gap-1 text-accent mb-1">
-          <Sparkles className="w-4 h-4" />
-          <span className="text-[11px] uppercase tracking-widest font-bold font-mono text-accent">Índice IMD</span>
-        </div>
-        <span className="text-5xl font-black font-display text-white tracking-tight leading-none">
-          {imd}<span className="text-accent text-3xl font-bold">%</span>
+        <span className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1 font-mono">Índice IMD</span>
+        <span className="text-5xl font-black font-display text-slate-900 tracking-tight leading-none">
+          {imd}<span className="text-primary-600 text-3xl font-bold">%</span>
         </span>
-        <div className="mt-2 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-accent/20 border border-accent/40 text-accent font-bold text-xs uppercase tracking-wider">
-          <Award className="w-3.5 h-3.5" />
+        <div className="mt-3 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary-50 border border-primary-200 text-primary-700 font-bold text-xs uppercase tracking-wider shadow-xs">
+          <Award className="w-3.5 h-3.5 text-primary-600" />
           {level}
         </div>
       </div>

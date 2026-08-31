@@ -115,12 +115,9 @@ export default function Results({ answers, lead }: ResultsProps) {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-gradient-to-br from-[#0D111A] via-[#1B2A4A] to-[#0D111A] text-white rounded-[2.5rem] p-8 md:p-12 shadow-2xl border border-accent/30 flex flex-col md:flex-row items-center gap-12 relative overflow-hidden"
+          className="bg-white rounded-3xl p-6 md:p-10 shadow-xl border border-slate-200/80 flex flex-col md:flex-row items-center gap-10"
         >
-          {/* Ambient Glow */}
-          <div className="absolute top-0 right-0 w-96 h-96 bg-accent/10 rounded-full blur-3xl pointer-events-none" />
-
-          <div className="flex-1 text-center md:text-left space-y-6 relative z-10">
+          <div className="flex-1 text-center md:text-left space-y-6">
             <ResultsHeader 
               name={lead.name}
               company={lead.company}
@@ -134,39 +131,39 @@ export default function Results({ answers, lead }: ResultsProps) {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 }}
-              className="bg-amber-500/15 border border-amber-500/30 rounded-2xl p-4 text-amber-200"
+              className="bg-amber-50 border border-amber-200 rounded-2xl p-4 text-amber-900"
             >
-              <p className="font-semibold text-xs sm:text-sm leading-relaxed">
+              <p className="font-medium text-xs sm:text-sm leading-relaxed">
                 {urgency.text}
               </p>
             </motion.div>
 
             {/* Validity Countdown */}
-            <div className="flex items-center justify-between text-xs sm:text-sm text-slate-300 bg-white/5 border border-white/10 rounded-xl px-4 py-3">
+            <div className="flex items-center justify-between text-xs sm:text-sm text-slate-500 bg-slate-50 border border-slate-100 rounded-xl px-4 py-3">
               <span className="flex items-center gap-2">
-                <Calendar className="w-4 h-4 text-accent" />
+                <Calendar className="w-4 h-4 text-primary-600" />
                 Vigencia del análisis: hasta {expirationDate.toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' })}
               </span>
-              <span className="text-xs font-bold bg-accent/20 text-accent border border-accent/30 rounded-full px-3 py-1">
+              <span className="text-xs font-bold bg-primary-100 text-primary-700 rounded-full px-3 py-1">
                 30 días
               </span>
             </div>
 
             {/* Sector Comparison */}
-            <div className="bg-white/5 border border-white/10 rounded-2xl p-4">
+            <div className="bg-gradient-to-r from-slate-50 via-primary-50/40 to-slate-50 border border-slate-200/80 rounded-2xl p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs sm:text-sm font-semibold text-slate-200">Posición vs empresas de tu tamaño</span>
-                <span className="text-sm sm:text-base font-black text-accent font-mono">Percentil {sectorPercentile}</span>
+                <span className="text-xs sm:text-sm font-bold text-slate-800">Posición vs empresas de tu tamaño</span>
+                <span className="text-xs sm:text-sm font-black text-primary-600 font-mono">Percentil {sectorPercentile}</span>
               </div>
-              <div className="w-full bg-white/10 rounded-full h-3">
+              <div className="w-full bg-slate-200 rounded-full h-2.5 overflow-hidden">
                 <motion.div
-                  className="h-full bg-gradient-to-r from-accent to-emerald-400 rounded-full"
+                  className="h-full bg-gradient-to-r from-primary-600 to-accent"
                   initial={{ width: 0 }}
                   animate={{ width: `${sectorPercentile}%` }}
                   transition={{ duration: 1, delay: 0.5 }}
                 />
               </div>
-              <p className="text-xs text-slate-400 mt-2">
+              <p className="text-xs text-slate-500 mt-2">
                 El {100 - sectorPercentile}% de empresas similares están en nivel {level.name} o superior
               </p>
             </div>
