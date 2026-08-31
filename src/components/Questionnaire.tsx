@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { ChevronLeft, ChevronRight, Rocket, Heart, Users, Cpu, BarChart3, Star, Save, Clock } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Rocket, Heart, Users, Cpu, BarChart3, Star, Save, Clock, Lightbulb } from 'lucide-react';
 import { Question } from '../types';
 import { DIMENSIONS } from '../constants';
+import { getQuestionContext } from '../utils/questionContext';
 
 interface QuestionnaireProps {
   questions: Question[];
@@ -89,6 +90,7 @@ export default function Questionnaire({
 
   const dimensionStatus = getDimensionStatus();
   const motivationalMessage = getMotivationalMessage(currentIdx, questions.length);
+  const questionInsight = getQuestionContext(question.id, question.dimension);
 
   const options = [
     { value: 1, label: 'Totalmente en desacuerdo' },
@@ -99,7 +101,7 @@ export default function Questionnaire({
   ];
 
   return (
-    <div className="min-h-screen bg-transparent p-6 flex flex-col items-center">
+    <div className="min-h-screen bg-transparent p-4 md:p-6 flex flex-col items-center font-sans">
       <div className="max-w-3xl w-full">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
@@ -207,12 +209,21 @@ export default function Questionnaire({
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="bg-white rounded-3xl p-8 md:p-12 shadow-xl border border-slate-100 min-h-[400px] flex flex-col justify-between"
+            className="bg-white rounded-3xl p-6 md:p-10 shadow-xl border border-slate-100 min-h-[400px] flex flex-col justify-between"
           >
-            <div className="space-y-8">
-              <h3 className="text-2xl md:text-3xl font-bold text-slate-800 leading-tight">
+            <div className="space-y-6">
+              <h3 className="text-xl md:text-2xl font-bold text-slate-800 leading-tight">
                 {question.text}
               </h3>
+
+              {/* Ambientación Executive Insight */}
+              <div className="bg-slate-50 border border-slate-200/80 rounded-2xl p-4 flex items-start gap-3 text-slate-600 text-xs sm:text-sm font-sans leading-relaxed">
+                <Lightbulb className="w-5 h-5 text-accent flex-shrink-0 mt-0.5" />
+                <div>
+                  <span className="font-bold text-slate-800">¿Por qué importa este indicador? </span>
+                  <span>{questionInsight}</span>
+                </div>
+              </div>
 
               <div className="grid grid-cols-1 gap-3">
                 {options.map((opt) => (

@@ -20,6 +20,7 @@ import BadgeNotification from './components/BadgeNotification';
 import ResumePrompt from './components/ResumePrompt';
 import SaveModal from './components/SaveModal';
 import ExitModal from './components/ExitModal';
+import EarlyLeadModal from './components/EarlyLeadModal';
 import FunnelHeader from './components/FunnelHeader';
 import FunnelFooter from './components/FunnelFooter';
 
@@ -30,11 +31,13 @@ export default function App() {
   const [lead, setLead] = useState<Lead | null>(null);
   const [showExitModal, setShowExitModal] = useState(false);
   const [showSaveModal, setShowSaveModal] = useState(false);
+  const [showEarlyLeadModal, setShowEarlyLeadModal] = useState(false);
+  const [hasCapturedEarlyLead, setHasCapturedEarlyLead] = useState(false);
   const [questionnaireStartTime, setQuestionnaireStartTime] = useState<number | undefined>(undefined);
   const [publicResultsId, setPublicResultsId] = useState<string>('');
   const [publicResultsToken, setPublicResultsToken] = useState<string>('');
 
-  const { currentIdx, setCurrentIdx, answers, setAnswers, handleAnswer, handleNext } = useQuestionnaire(() => {
+  const { currentIdx, setCurrentIdx, answers, setAnswers, handleAnswer, handleNext: rawHandleNext } = useQuestionnaire(() => {
     if (!lead) {
       transitionToScreen('leadform');
       trackLeadformStart(
@@ -44,6 +47,53 @@ export default function App() {
       finishDiagnostic(answers, lead, setLead, transitionToScreen);
     }
   });
+
+  const handleNextWithEarlyCapture = () => {
+    // Early capture at Question 8 (Index 7: End of Estrategia Digital)
+    if (currentIdx === 7 && !lead && !hasCapturedEarlyLead) {
+      setShowEarlyLeadModal(true);
+      return;
+    }
+    rawHandleNext();
+  };
+
+  const handleEarlyLeadSave = async (data: { name: string; email: string; company: string; gdprConsent: boolean }) => {
+    const fullLead: Lead = {
+      name: data.name,
+      email: data.email,
+      company: data.company || 'Empresa',
+      phone: '',
+      size: '10-50',
+      role: 'Directivo',
+      industry: 'General',
+      gdprConsent: data.gdprConsent,
+      gdprTimestamp: Date.now()
+    };
+    
+    setLead(fullLead);
+    setHasCapturedEarlyLead(true);
+    setShowEarlyLeadModal(false);
+
+    // Register partial lead immediately in database
+    try {
+      await fetch('/api/contact.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: fullLead.name,
+          email: fullLead.email,
+          company: fullLead.company,
+          message: 'Lead capturado tempranamente en Módulo 1 DIGITAL-H (Estrategia Digital)',
+          source: 'digital-h-early-module1'
+        })
+      });
+    } catch {
+      // Non-blocking
+    }
+
+    // Continue to Question 9 (Index 8)
+    setCurrentIdx(8);
+  };
 
   const { points, unlockedBadges, showBadge, setShowBadge } = useGameState(answers);
   const { showResumePrompt, setShowResumePrompt, loadSession } = useSession(answers, currentIdx, points, unlockedBadges, screen);
@@ -159,7 +209,7 @@ export default function App() {
             currentIdx={currentIdx}
             answers={answers}
             onAnswer={handleAnswer}
-            onNext={handleNext}
+            onNext={handleNextWithEarlyCapture}
             onPrev={() => setCurrentIdx(Math.max(0, currentIdx - 1))}
             onSaveSession={handleSaveSession}
             points={points}
@@ -182,6 +232,7 @@ export default function App() {
           <PublicResultsPage id={publicResultsId} token={publicResultsToken} />
         )}
 
+      <EarlyLeadModal isOpen={showEarlyLeadModal} onSave={handleEarlyLeadSave} />
       <ResumePrompt show={showResumePrompt} onResume={handleResume} onRestart={handleRestart} />
       <BadgeNotification showBadge={showBadge} onClose={() => setShowBadge(null)} />
       <SaveModal show={showSaveModal} onClose={() => setShowSaveModal(false)} />
