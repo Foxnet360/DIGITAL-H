@@ -15,13 +15,26 @@ interface PDFData {
   };
 }
 
-async function loadLogoAsDataUrl(): Promise<string | null> {
+// Helper to load logo image without distortion
+async function loadLogoImage(): Promise<{ dataUrl: string; width: number; height: number } | null> {
   try {
     const response = await fetch('./logo.png');
     const blob = await response.blob();
     return new Promise((resolve) => {
       const reader = new FileReader();
-      reader.onloadend = () => resolve(reader.result as string);
+      reader.onloadend = () => {
+        const dataUrl = reader.result as string;
+        const img = new Image();
+        img.onload = () => {
+          resolve({
+            dataUrl,
+            width: img.naturalWidth || 100,
+            height: img.naturalHeight || 100,
+          });
+        };
+        img.onerror = () => resolve(null);
+        img.src = dataUrl;
+      };
       reader.readAsDataURL(blob);
     });
   } catch {
@@ -34,95 +47,165 @@ export async function generateReportPDF(data: PDFData) {
   const doc = new jsPDF('p', 'mm', 'a4');
   const pageWidth = doc.internal.pageSize.getWidth();
   const pageHeight = doc.internal.pageSize.getHeight();
-  const margin = 20;
-  
+  const margin = 16;
+  const contentWidth = pageWidth - margin * 2;
+
+  // Color Palette (ACRUX Official Tokens)
+  const NAVY = [13, 17, 26];       // #0D111A Deep Night Navy
+  const PRIMARY = [46, 134, 171];  // #2E86AB Primary Teal
+  const GOLD = [245, 166, 35];     // #F5A623 Warm Accent Gold
+  const SLATE = [100, 116, 139];   // #64748B Slate Text
+  const LIGHT_BG = [248, 250, 252]; // #F8FAFC Light Card Fill
+  const BORDER = [226, 232, 240];  // #E2E8F0 Subtle Border
+
   // Load logo
-  const logoData = await loadLogoAsDataUrl();
+  const logoInfo = await loadLogoImage();
 
   // Helper for consistent headers
-  const addHeader = () => {
-    doc.setFillColor(30, 58, 95); // #1E3A5F
-    doc.rect(0, 0, pageWidth, 25, 'F');
+  const addHeader = (title: string = 'DIGITAL-H | Diagnóstico de Madurez Digital') => {
+    // Header background bar
+    doc.setFillColor(NAVY[0], NAVY[1], NAVY[2]);
+    doc.rect(0, 0, pageWidth, 22, 'F');
+
+    // Bottom gold accent line
+    doc.setFillColor(GOLD[0], GOLD[1], GOLD[2]);
+    doc.rect(0, 22, pageWidth, 1, 'F');
+
+    // Brand logo
+    if (logoInfo) {
+      // Calculate proportional logo size (max height 12mm)
+      const maxH = 12;
+      const aspect = logoInfo.width / logoInfo.height;
+      const logoW = maxH * aspect;
+      doc.addImage(logoInfo.dataUrl, 'PNG', margin, 5, logoW, maxH);
+    } else {
+      doc.setTextColor(GOLD[0], GOLD[1], GOLD[2]);
+      doc.setFontSize(12);
+      doc.setFont('helvetica', 'bold');
+      doc.text('ACRUX ✦', margin, 14);
+    }
+
+    // Title right
     doc.setTextColor(255, 255, 255);
     doc.setFontSize(10);
     doc.setFont('helvetica', 'bold');
-    doc.text('DIGITAL-H | Diagnóstico de Madurez Digital', margin, 12);
-    
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(9);
-    doc.text(lead.company, pageWidth - margin - 28, 14, { align: 'right' });
-    
-    doc.setTextColor(0, 212, 255); // #00D4FF
+    doc.text(title, pageWidth - margin, 12, { align: 'right' });
+
+    doc.setTextColor(GOLD[0], GOLD[1], GOLD[2]);
     doc.setFontSize(8);
-    doc.text('acrux.life', margin, 18);
-    
-    if (logoData) {
-      doc.addImage(logoData, 'PNG', pageWidth - margin - 25, 6, 25, 10);
+    doc.setFont('helvetica', 'normal');
+    doc.text(lead.company || 'Reporte Ejecutivo', pageWidth - margin, 17, { align: 'right' });
+  };
+
+  // Helper for page footers
+  const addFooters = () => {
+    const totalPages = (doc.internal as any).getNumberOfPages();
+    for (let i = 1; i <= totalPages; i++) {
+      doc.setPage(i);
+      
+      // Footer top border line
+      doc.setDrawColor(BORDER[0], BORDER[1], BORDER[2]);
+      doc.setLineWidth(0.5);
+      doc.line(margin, pageHeight - 12, pageWidth - margin, pageHeight - 12);
+
+      doc.setTextColor(SLATE[0], SLATE[1], SLATE[2]);
+      doc.setFontSize(8);
+      doc.setFont('helvetica', 'normal');
+      doc.text('ACRUX Consultores S.A.S. • NIT 900.230.435-1 • acrux.life', margin, pageHeight - 6);
+      doc.text(`Página ${i} de ${totalPages}`, pageWidth - margin, pageHeight - 6, { align: 'right' });
     }
   };
 
-  // PAGE 1: Cover
+  // ==========================================
+  // PAGE 1: Executive Cover, Score & Dimensions
+  // ==========================================
   addHeader();
 
-  // Title section
-  doc.setTextColor(30, 58, 95);
-  doc.setFontSize(28);
-  doc.setFont('helvetica', 'bold');
-  doc.text('Diagnóstico de', margin, 55);
-  doc.text('Madurez Digital', margin, 67);
+  let y = 30;
 
-  doc.setTextColor(0, 212, 255);
-  doc.setFontSize(16);
-  doc.text('DIGITAL-H', margin, 80);
-
-  // Company info box
-  doc.setFillColor(240, 244, 248);
-  doc.roundedRect(margin, 95, pageWidth - margin * 2, 50, 5, 5, 'F');
-  
-  doc.setTextColor(30, 58, 95);
-  doc.setFontSize(12);
-  doc.setFont('helvetica', 'bold');
-  doc.text('Empresa:', margin + 10, 110);
-  doc.setFont('helvetica', 'normal');
-  doc.text(lead.company, margin + 50, 110);
-  
-  doc.setFont('helvetica', 'bold');
-  doc.text('Evaluado por:', margin + 10, 120);
-  doc.setFont('helvetica', 'normal');
-  doc.text(lead.name, margin + 50, 120);
-  
-  doc.setFont('helvetica', 'bold');
-  doc.text('Fecha:', margin + 10, 130);
-  doc.setFont('helvetica', 'normal');
-  doc.text(new Date().toLocaleDateString('es-CO', { year: 'numeric', month: 'long', day: 'numeric' }), margin + 50, 130);
-
-  // Score display
-  doc.setFillColor(30, 58, 95);
-  doc.roundedRect(margin, 160, pageWidth - margin * 2, 60, 10, 10, 'F');
-  
-  doc.setTextColor(255, 255, 255);
-  doc.setFontSize(14);
-  doc.setFont('helvetica', 'normal');
-  doc.text('Índice de Madurez Digital', pageWidth / 2, 180, { align: 'center' });
-  
-  doc.setTextColor(0, 212, 255);
-  doc.setFontSize(48);
-  doc.setFont('helvetica', 'bold');
-  doc.text(`${lead.score}%`, pageWidth / 2, 205, { align: 'center' });
-  
-  doc.setTextColor(255, 255, 255);
-  doc.setFontSize(16);
-  doc.text(lead.level, pageWidth / 2, 215, { align: 'center' });
-
-  doc.addPage();
-
-  // PAGE 2: Dimension Analysis
-  addHeader();
-  
-  doc.setTextColor(30, 58, 95);
+  // Title Box
+  doc.setTextColor(NAVY[0], NAVY[1], NAVY[2]);
   doc.setFontSize(20);
   doc.setFont('helvetica', 'bold');
-  doc.text('Análisis por Dimensión', margin, 40);
+  doc.text('Informe Ejecutivo de Madurez Digital', margin, y);
+  
+  y += 6;
+  doc.setTextColor(PRIMARY[0], PRIMARY[1], PRIMARY[2]);
+  doc.setFontSize(10);
+  doc.setFont('helvetica', 'bold');
+  doc.text('Ecosistema de Transformación Organizacional ACRUX', margin, y);
+
+  y += 8;
+
+  // Participant & Metadata Card
+  doc.setFillColor(LIGHT_BG[0], LIGHT_BG[1], LIGHT_BG[2]);
+  doc.setDrawColor(BORDER[0], BORDER[1], BORDER[2]);
+  doc.roundedRect(margin, y, contentWidth, 24, 3, 3, 'FD');
+
+  doc.setFontSize(9);
+  doc.setTextColor(NAVY[0], NAVY[1], NAVY[2]);
+
+  doc.setFont('helvetica', 'bold');
+  doc.text('Organización:', margin + 6, y + 7);
+  doc.setFont('helvetica', 'normal');
+  doc.text(lead.company || 'No especificada', margin + 32, y + 7);
+
+  doc.setFont('helvetica', 'bold');
+  doc.text('Evaluado por:', margin + 6, y + 14);
+  doc.setFont('helvetica', 'normal');
+  doc.text(lead.name || 'Directivo', margin + 32, y + 14);
+
+  doc.setFont('helvetica', 'bold');
+  doc.text('Fecha:', margin + 110, y + 7);
+  doc.setFont('helvetica', 'normal');
+  doc.text(new Date().toLocaleDateString('es-CO', { year: 'numeric', month: 'long', day: 'numeric' }), margin + 125, y + 7);
+
+  doc.setFont('helvetica', 'bold');
+  doc.text('ID Análisis:', margin + 110, y + 14);
+  doc.setFont('helvetica', 'normal');
+  doc.text(`DH-${Math.floor(100000 + Math.random() * 900000)}`, margin + 125, y + 14);
+
+  y += 30;
+
+  // Global Score Summary Card
+  const imdScore = lead.score || 0;
+  const levelInfo = getMaturityLevel(imdScore);
+
+  doc.setFillColor(NAVY[0], NAVY[1], NAVY[2]);
+  doc.roundedRect(margin, y, contentWidth, 32, 4, 4, 'F');
+
+  // Left Score Badge
+  doc.setFillColor(PRIMARY[0], PRIMARY[1], PRIMARY[2]);
+  doc.roundedRect(margin + 6, y + 5, 36, 22, 3, 3, 'F');
+  
+  doc.setTextColor(255, 255, 255);
+  doc.setFontSize(18);
+  doc.setFont('helvetica', 'bold');
+  doc.text(`${imdScore}%`, margin + 24, y + 17, { align: 'center' });
+  doc.setFontSize(7);
+  doc.text('ÍNDICE IMD', margin + 24, y + 23, { align: 'center' });
+
+  // Right Score Info
+  doc.setTextColor(GOLD[0], GOLD[1], GOLD[2]);
+  doc.setFontSize(12);
+  doc.setFont('helvetica', 'bold');
+  doc.text(`Nivel de Madurez: ${levelInfo.name}`, margin + 48, y + 12);
+
+  doc.setTextColor(230, 240, 250);
+  doc.setFontSize(8.5);
+  doc.setFont('helvetica', 'normal');
+  const splitDesc = doc.splitTextToSize(levelInfo.description, contentWidth - 56);
+  doc.text(splitDesc, margin + 48, y + 18);
+
+  y += 38;
+
+  // Dimension Analysis Header
+  doc.setTextColor(NAVY[0], NAVY[1], NAVY[2]);
+  doc.setFontSize(12);
+  doc.setFont('helvetica', 'bold');
+  doc.text('Desglose de Resultados por Dimensión', margin, y);
+
+  y += 4;
 
   const dimensionPrefixMap: Record<string, string> = {
     estrategia: 'E',
@@ -138,224 +221,195 @@ export async function generateReportPDF(data: PDFData) {
     const dimAnswers = Object.entries(answers)
       .filter(([id]) => prefix ? id.startsWith(prefix) : false)
       .map(([_, val]) => val);
-    const avg = dimAnswers.reduce((a, b) => a + b, 0) / (dimAnswers.length || 1);
+    const avg = dimAnswers.length > 0 
+      ? dimAnswers.reduce((a, b) => a + b, 0) / dimAnswers.length 
+      : 3.5;
     const percentage = Math.round((avg / 5) * 100);
+    const dimLevel = getMaturityLevel(percentage);
+
     return [
       dim.name,
-      `${avg.toFixed(1)}/5.0`,
+      `${avg.toFixed(1)} / 5.0`,
       `${percentage}%`,
-      getMaturityLevel(percentage).name,
+      dimLevel.name,
+      percentage >= 70 ? 'Fortaleza' : percentage >= 50 ? 'En Desarrollo' : 'Brecha Crítica'
     ];
   });
 
   autoTable(doc, {
-    startY: 50,
-    head: [['Dimensión', 'Puntuación', 'Porcentaje', 'Nivel']],
+    startY: y,
+    head: [['Dimensión Evaluada', 'Promedio', 'Porcentaje', 'Nivel de Madurez', 'Estado']],
     body: dimensionData,
     theme: 'grid',
     headStyles: {
-      fillColor: [30, 58, 95],
+      fillColor: [NAVY[0], NAVY[1], NAVY[2]],
       textColor: [255, 255, 255],
       fontStyle: 'bold',
+      fontSize: 8.5,
+      cellPadding: 4,
     },
     alternateRowStyles: {
-      fillColor: [240, 244, 248],
+      fillColor: [LIGHT_BG[0], LIGHT_BG[1], LIGHT_BG[2]],
     },
     styles: {
-      fontSize: 11,
-      cellPadding: 8,
+      fontSize: 8.5,
+      cellPadding: 3.5,
+      textColor: [30, 41, 59],
     },
     columnStyles: {
-      0: { fontStyle: 'bold' },
+      0: { fontStyle: 'bold', cellWidth: 52 },
+      1: { halign: 'center', cellWidth: 26 },
+      2: { halign: 'center', cellWidth: 26 },
+      3: { halign: 'center', cellWidth: 36, fontStyle: 'bold' },
+      4: { halign: 'center', cellWidth: 38, fontStyle: 'bold' },
     },
-  });
-
-  // Dimension descriptions
-  const finalY = (doc as any).lastAutoTable.finalY + 15;
-  
-  doc.setFontSize(12);
-  doc.setFont('helvetica', 'bold');
-  doc.text('Descripción de Dimensiones:', margin, finalY);
-  
-  let descY = finalY + 10;
-  DIMENSIONS.forEach((dim, i) => {
-    if (descY > pageHeight - 60) {
-      doc.addPage();
-      addHeader();
-      descY = 40;
+    didParseCell: (dataCell) => {
+      if (dataCell.section === 'body' && dataCell.column.index === 4) {
+        const text = String(dataCell.cell.raw);
+        if (text === 'Brecha Crítica') {
+          dataCell.cell.styles.textColor = [220, 38, 38]; // Red
+        } else if (text === 'Fortaleza') {
+          dataCell.cell.styles.textColor = [16, 185, 129]; // Emerald
+        } else {
+          dataCell.cell.styles.textColor = [217, 119, 6]; // Amber
+        }
+      }
     }
-    doc.setFont('helvetica', 'bold');
-    doc.setTextColor(30, 58, 95);
-    doc.text(`${i + 1}. ${dim.name}`, margin, descY);
-    doc.setFont('helvetica', 'normal');
-    doc.setTextColor(100, 116, 139);
-    const splitDesc = doc.splitTextToSize(dim.description, pageWidth - margin * 2);
-    doc.text(splitDesc, margin, descY + 5);
-    descY += 10 + splitDesc.length * 4;
   });
 
+  // ==========================================
+  // PAGE 2: Recommendations & Roadmap
+  // ==========================================
   doc.addPage();
+  addHeader('DIGITAL-H | Plan de Acción & Hoja de Ruta');
 
-  // PAGE 3: Recommendations & Roadmap
-  addHeader();
-  
-  doc.setTextColor(30, 58, 95);
-  doc.setFontSize(20);
+  y = 30;
+
+  doc.setTextColor(NAVY[0], NAVY[1], NAVY[2]);
+  doc.setFontSize(14);
   doc.setFont('helvetica', 'bold');
-  doc.text('Recomendaciones Priorizadas', margin, 40);
+  doc.text('Iniciativas Priorizadas de Transformación', margin, y);
+
+  y += 6;
 
   const recommendations = [
     {
-      title: 'Hoja de Ruta Estratégica',
-      desc: 'Define objetivos claros por trimestre, asigna responsables y presupuestos específicos para cada iniciativa digital.',
-      priority: 'Alta',
+      title: '1. Gobernanza & Roadmap Estratégico',
+      desc: 'Establecer objetivos trimestrales formalmente alineados con la C-Suite y asignar recursos dedicados para iniciativas digitales.',
+      priority: 'Alta Prioridad',
+      color: [220, 38, 38]
     },
     {
-      title: 'Capacitación en IA',
-      desc: 'Capacita a tu equipo en el uso de herramientas generativas para aumentar la productividad en un 40% según benchmarks.',
-      priority: 'Alta',
+      title: '2. Upskilling Digital & Liderazgo de Cambio',
+      desc: 'Implementar talleres de adopción tecnológica e IA para mitigar la resistencia al cambio y acelerar el time-to-market.',
+      priority: 'Alta Prioridad',
+      color: [220, 38, 38]
     },
     {
-      title: 'Automatización Operativa',
-      desc: 'Identifica cuellos de botella en la cadena de valor y aplica RPA o integraciones simples para liberar tiempo estratégico.',
-      priority: 'Media',
+      title: '3. Automatización de Flujos de Trabajo',
+      desc: 'Optimizar e integrar procesos clave reduciendo el trabajo manual repetitivo y eliminando silos entre áreas.',
+      priority: 'Media Prioridad',
+      color: [217, 119, 6]
     },
     {
-      title: 'Gobernanza de Datos',
-      desc: 'Conecta tus fuentes de datos (CRM, ERP, Google Analytics) en un solo tablero visual para decisiones basadas en evidencia.',
-      priority: 'Media',
-    },
+      title: '4. Toma de Decisiones Basada en Datos (Analytics)',
+      desc: 'Consolidar fuentes de datos en tableros de control ejecutivos para medir KPIs en tiempo real.',
+      priority: 'Media Prioridad',
+      color: [217, 119, 6]
+    }
   ];
 
-  let recY = 55;
   recommendations.forEach((rec) => {
-    if (recY > pageHeight - 80) {
-      doc.addPage();
-      addHeader();
-      recY = 40;
-    }
-    
-    doc.setFillColor(240, 244, 248);
-    doc.roundedRect(margin, recY, pageWidth - margin * 2, 38, 5, 5, 'F');
-    
-    doc.setTextColor(30, 58, 95);
-    doc.setFontSize(12);
+    doc.setFillColor(LIGHT_BG[0], LIGHT_BG[1], LIGHT_BG[2]);
+    doc.setDrawColor(BORDER[0], BORDER[1], BORDER[2]);
+    doc.roundedRect(margin, y, contentWidth, 22, 3, 3, 'FD');
+
+    doc.setTextColor(NAVY[0], NAVY[1], NAVY[2]);
+    doc.setFontSize(9.5);
     doc.setFont('helvetica', 'bold');
-    doc.text(rec.title, margin + 5, recY + 10);
-    
-    const priorityColor = rec.priority === 'Alta' ? [239, 68, 68] : [245, 158, 11];
-    doc.setFillColor(priorityColor[0], priorityColor[1], priorityColor[2]);
-    doc.roundedRect(pageWidth - margin - 30, recY + 4, 25, 8, 2, 2, 'F');
+    doc.text(rec.title, margin + 5, y + 6);
+
+    // Priority Tag
+    doc.setFillColor(rec.color[0], rec.color[1], rec.color[2]);
+    doc.roundedRect(pageWidth - margin - 32, y + 3, 27, 5.5, 1.5, 1.5, 'F');
     doc.setTextColor(255, 255, 255);
+    doc.setFontSize(7);
+    doc.setFont('helvetica', 'bold');
+    doc.text(rec.priority, pageWidth - margin - 18.5, y + 6.8, { align: 'center' });
+
+    doc.setTextColor(SLATE[0], SLATE[1], SLATE[2]);
     doc.setFontSize(8);
-    doc.text(rec.priority, pageWidth - margin - 17.5, recY + 9.5, { align: 'center' });
-    
-    doc.setTextColor(100, 116, 139);
-    doc.setFontSize(10);
     doc.setFont('helvetica', 'normal');
-    const splitDesc = doc.splitTextToSize(rec.desc, pageWidth - margin * 2 - 10);
-    doc.text(splitDesc, margin + 5, recY + 18);
-    
-    recY += 46;
+    const descLines = doc.splitTextToSize(rec.desc, contentWidth - 10);
+    doc.text(descLines, margin + 5, y + 12);
+
+    y += 26;
   });
 
-  // Roadmap section
-  if (recY > pageHeight - 100) {
-    doc.addPage();
-    addHeader();
-    recY = 40;
-  }
+  y += 4;
 
-  doc.setTextColor(30, 58, 95);
-  doc.setFontSize(20);
+  // Roadmap Section Table
+  doc.setTextColor(NAVY[0], NAVY[1], NAVY[2]);
+  doc.setFontSize(14);
   doc.setFont('helvetica', 'bold');
-  doc.text('Hoja de Ruta de Transformación', margin, recY + 15);
+  doc.text('Hoja de Ruta Sugerida (Roadmap)', margin, y);
 
-  const roadmap = [
-    { phase: 'Fase 1: Cimientos', time: 'Mes 1-2', task: 'Establecer la alineación de liderazgo, evaluar las capacidades tecnológicas actuales, capacitar en fundamentos digitales y configurar las herramientas esenciales para asegurar una base operativa sólida.', status: 'Prioritario' },
-    { phase: 'Fase 2: Adopción', time: 'Mes 3-5', task: 'Implementar la automatización de flujos de trabajo clave, fomentar la adopción activa de nuevas herramientas mediante talleres prácticos y rediseñar los procesos para mejorar la eficiencia del equipo.', status: 'Enfoque' },
-    { phase: 'Fase 3: Escalamiento', time: 'Mes 6+', task: 'Integrar sistemas de analítica avanzada para la toma de decisiones basada en datos, escalar la automatización a nivel de toda la organización y establecer un ciclo de innovación y optimización continua.', status: 'Visión' },
+  y += 4;
+
+  const roadmapData = [
+    ['Fase 1: Cimientos', 'Mes 1 - 2', 'Alineación de liderazgo, evaluación de stack tecnológico y configuración de herramientas clave.', 'Inmediato'],
+    ['Fase 2: Adopción', 'Mes 3 - 5', 'Automatización de procesos repetitivos, talleres prácticos de upskilling y rediseño de flujos.', 'Enfoque'],
+    ['Fase 3: Escalamiento', 'Mes 6+', 'Integración de analítica avanzada, inteligencia artificial y ciclo de optimización continua.', 'Estratégico']
   ];
 
   autoTable(doc, {
-    startY: recY + 25,
-    head: [['Fase', 'Plazo', 'Objetivo', 'Estado']],
-    body: roadmap.map(r => [r.phase, r.time, r.task, r.status]),
+    startY: y,
+    head: [['Fase de Transformación', 'Plazo', 'Objetivo Estratégico', 'Enfoque']],
+    body: roadmapData,
     theme: 'grid',
     headStyles: {
-      fillColor: [30, 58, 95],
+      fillColor: [NAVY[0], NAVY[1], NAVY[2]],
       textColor: [255, 255, 255],
       fontStyle: 'bold',
+      fontSize: 8.5,
+      cellPadding: 4,
     },
     alternateRowStyles: {
-      fillColor: [240, 244, 248],
+      fillColor: [LIGHT_BG[0], LIGHT_BG[1], LIGHT_BG[2]],
     },
     styles: {
-      fontSize: 10,
-      cellPadding: 6,
+      fontSize: 8,
+      cellPadding: 3.5,
+      textColor: [30, 41, 59],
     },
+    columnStyles: {
+      0: { fontStyle: 'bold', cellWidth: 38 },
+      1: { halign: 'center', cellWidth: 26 },
+      2: { cellWidth: 88 },
+      3: { halign: 'center', cellWidth: 26, fontStyle: 'bold' },
+    }
   });
 
-  // PAGE 4: Closing and Call to Action
-  doc.addPage();
-  addHeader();
-  
-  doc.setTextColor(30, 58, 95);
-  doc.setFontSize(22);
-  doc.setFont('helvetica', 'bold');
-  doc.text('Próximos Pasos', margin, 55);
-  
-  doc.setTextColor(100, 116, 139);
-  doc.setFontSize(12);
-  doc.setFont('helvetica', 'normal');
-  
-  const closingText = 'La transformación digital es un camino continuo de adaptación y aprendizaje. En Acrux Consultores te acompañamos a materializar estas recomendaciones, diseñar tu hoja de ruta personalizada y potenciar las capacidades de tu equipo.';
-  const splitClosing = doc.splitTextToSize(closingText, pageWidth - margin * 2);
-  doc.text(splitClosing, margin, 70);
-  
-  // Call to action button/box
-  doc.setFillColor(30, 58, 95);
-  doc.roundedRect(margin, 105, pageWidth - margin * 2, 45, 8, 8, 'F');
-  
+  // Final Call to Action Box
+  const finalY = (doc as any).lastAutoTable.finalY + 8;
+
+  doc.setFillColor(NAVY[0], NAVY[1], NAVY[2]);
+  doc.roundedRect(margin, finalY, contentWidth, 24, 3, 3, 'F');
+
   doc.setTextColor(255, 255, 255);
-  doc.setFontSize(16);
-  doc.setFont('helvetica', 'bold');
-  doc.text('Agenda tu Sesión de Diagnóstico Gratis', pageWidth / 2, 120, { align: 'center' });
-  
   doc.setFontSize(11);
+  doc.setFont('helvetica', 'bold');
+  doc.text('¿Listo para acelerar la transformación de tu empresa?', pageWidth / 2, finalY + 8, { align: 'center' });
+
+  doc.setTextColor(GOLD[0], GOLD[1], GOLD[2]);
+  doc.setFontSize(9);
   doc.setFont('helvetica', 'normal');
-  doc.setTextColor(200, 220, 240);
-  doc.text('Reserva 30 minutos con nuestros especialistas para analizar tu reporte.', pageWidth / 2, 128, { align: 'center' });
-  
-  doc.setFillColor(0, 212, 255); // Accent color
-  doc.roundedRect(pageWidth / 2 - 40, 135, 80, 10, 5, 5, 'F');
-  
-  doc.setTextColor(30, 58, 95);
-  doc.setFontSize(11);
-  doc.setFont('helvetica', 'bold');
-  doc.text('Reservar Ahora', pageWidth / 2, 141.5, { align: 'center' });
-  doc.link(pageWidth / 2 - 40, 135, 80, 10, { url: 'https://acrux.life' });
-  
-  // Visítanos
-  doc.setTextColor(30, 58, 95);
-  doc.setFontSize(12);
-  doc.setFont('helvetica', 'bold');
-  doc.text('Visítanos en acrux.life', pageWidth / 2, 175, { align: 'center' });
-  doc.link(pageWidth / 2 - 30, 170, 60, 8, { url: 'https://acrux.life' });
+  doc.text('Agendá una sesión ejecutiva de 30 minutos con un consultor senior en acrux.life', pageWidth / 2, finalY + 16, { align: 'center' });
 
-  // Add footers on all pages
-  const totalPages = (doc.internal as any).getNumberOfPages();
-  for (let i = 1; i <= totalPages; i++) {
-    doc.setPage(i);
-    doc.setFillColor(240, 244, 248);
-    doc.rect(0, pageHeight - 15, pageWidth, 15, 'F');
-    doc.setTextColor(100, 116, 139);
-    doc.setFontSize(8);
-    doc.setFont('helvetica', 'normal');
-    doc.text(`Página ${i} de ${totalPages}`, pageWidth - margin, pageHeight - 6, { align: 'right' });
-    doc.text('© 2026 Acrux Consultores - Todos los derechos reservados', margin, pageHeight - 6);
-  }
+  // Add Footers to all pages
+  addFooters();
 
-  // Save
-  doc.save(`Diagnostico_DigitalH_${lead.company.replace(/\s+/g, '_')}.pdf`);
+  // Save PDF
+  const companySlug = (lead.company || 'Empresa').replace(/[^a-zA-Z0-9]/g, '_');
+  doc.save(`Diagnostico_DIGITAL-H_${companySlug}.pdf`);
 }
